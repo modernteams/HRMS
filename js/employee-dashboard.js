@@ -52,7 +52,7 @@ else{
 
 
 greetingElement.innerHTML =
-`${greeting}, Admin 👋`;
+`${greeting}, Employee 👋`;
 
 
 }
