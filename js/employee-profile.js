@@ -1,6 +1,5 @@
 let currentUser = null;
-
-
+let selectedImage = null;
 // =====================
 // LOAD PROFILE
 // =====================
@@ -72,9 +71,11 @@ profile.full_name || "Employee";
 
 
 
-document.getElementById("employeeRole")
+
+
+document.getElementById("employeeDesignation")
 .innerText =
-profile.role || "Employee";
+profile.designation || "Employee";
 
 
 
@@ -163,7 +164,7 @@ new Date(profile.created_at)
 if(profile.profile_image){
 
 
-document.getElementById("employeeImage")
+document.getElementById("employeePhoto")
 .src =
 profile.profile_image;
 
@@ -177,10 +178,64 @@ profile.profile_image;
 }
 
 
+async function uploadProfileImage(){
+
+
+if(!selectedImage){
+return null;
+}
+
+
+console.log("Uploading:", selectedImage);
+
+
+const fileName =
+currentUser.id +
+"-" +
+Date.now();
+
+
+const {data,error}=await supabaseClient
+.storage
+.from("profile-images")
+.upload(
+fileName,
+selectedImage,
+{
+cacheControl:"3600",
+upsert:true
+}
+);
+
+
+console.log("UPLOAD DATA:",data);
+console.log("UPLOAD ERROR:",error);
+
+
+if(error){
+
+return null;
+
+}
+
+
+const {data:urlData}=supabaseClient
+.storage
+.from("profile-images")
+.getPublicUrl(fileName);
 
 
 
+console.log(
+"IMAGE URL:",
+urlData.publicUrl
+);
 
+
+
+return urlData.publicUrl;
+
+}
 
 
 // =====================
@@ -194,34 +249,41 @@ document
 "click",
 async()=>{
 
+let imageUrl = null;
+
+
+if(selectedImage){
+
+imageUrl =
+await uploadProfileImage();
+
+}
+
 
 
 const updates={
 
 
 full_name:
-
 document.getElementById("name").value,
 
 
-
 phone:
-
 document.getElementById("phone").value,
 
 
-
 address:
-
 document.getElementById("address").value
-
 
 
 };
 
 
+if(imageUrl){
 
+updates.profile_image = imageUrl;
 
+}
 
 
 const {error}
@@ -258,7 +320,11 @@ document.getElementById("profileMessage")
 .innerText =
 "Profile Updated Successfully ✅";
 
+if(imageUrl){
 
+document.getElementById("employeeImage").src = imageUrl;
+
+}
 
 
 
@@ -332,7 +398,26 @@ alert(
 
 
 
+document
+.getElementById("profilePhoto")
+.addEventListener(
+"change",
+(e)=>{
 
+
+selectedImage =
+e.target.files[0];
+
+
+if(selectedImage){
+
+document.getElementById("employeeImage").src =
+URL.createObjectURL(selectedImage);
+
+}
+
+
+});
 
 
 
