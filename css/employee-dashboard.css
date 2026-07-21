@@ -1,6 +1,7 @@
 /* =====================================
-   EMPLOYEE DASHBOARD
-   Modern Teams HRMS
+   MODERN TEAMS HRMS
+   EMPLOYEE DASHBOARD V2
+   PREMIUM BLACK WHITE GOLD THEME
 ===================================== */
 
 
@@ -9,87 +10,258 @@
 ========================= */
 
 .dashboard{
-    display:flex;
-    flex-direction:column;
-    gap:25px;
-}
 
+display:flex;
 
+flex-direction:column;
 
-/* =========================
-   WELCOME BOX
-========================= */
-
-.welcome-box{
-
-    padding:30px;
-
-}
-
-
-.welcome-box h2{
-
-    font-size:28px;
-    margin-bottom:10px;
-
-}
-
-
-.welcome-box p{
-
-    color:#6b7280;
-    font-size:15px;
+gap:25px;
 
 }
 
 
 
 /* =========================
-   PROFILE SUMMARY
+   PROFILE HERO
 ========================= */
 
-.profile-summary{
 
-    display:flex;
-    align-items:center;
-    gap:20px;
+.profile-hero{
 
-    padding:25px;
+display:flex;
+
+align-items:center;
+
+gap:30px;
+
+padding:35px;
+
+border-radius:24px;
+
+background:linear-gradient(
+135deg,
+#111111,
+#252525
+);
+
+color:white;
+
+box-shadow:var(--shadow-lg);
+
+position:relative;
+
+overflow:hidden;
+
+}
+
+
+
+.profile-hero::after{
+
+content:"";
+
+position:absolute;
+
+right:-80px;
+
+top:-80px;
+
+width:220px;
+
+height:220px;
+
+background:rgba(212,175,55,.15);
+
+border-radius:50%;
 
 }
 
 
 
-.profile-summary img{
+.profile-image{
 
-    width:90px;
-    height:90px;
-
-    border-radius:50%;
-
-    object-fit:cover;
-
-    border:3px solid #e5e7eb;
+z-index:2;
 
 }
 
 
 
-.profile-summary h2{
+.profile-image img{
 
-    margin-bottom:8px;
+width:110px;
+
+height:110px;
+
+border-radius:50%;
+
+object-fit:cover;
+
+border:4px solid var(--gold);
 
 }
 
 
-.profile-summary p{
 
-    margin:5px 0;
+.profile-details{
 
-    color:#6b7280;
+z-index:2;
 
 }
 
+
+
+.profile-details h2{
+
+font-size:30px;
+
+margin-bottom:8px;
+
+color:white;
+
+}
+
+
+
+.profile-details p{
+
+margin:6px 0;
+
+color:#dddddd;
+
+font-size:16px;
+
+}
+
+
+
+.status-badge{
+
+display:inline-block;
+
+margin-top:12px;
+
+padding:8px 18px;
+
+background:#16a34a;
+
+color:white;
+
+border-radius:30px;
+
+font-size:13px;
+
+font-weight:600;
+
+}
+
+
+
+/* =========================
+   STATS SECTION
+========================= */
+
+
+.stats-container{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:20px;
+
+}
+
+
+
+.stat-box{
+
+
+padding:25px;
+
+border-radius:20px;
+
+background:white;
+
+border:1px solid var(--border);
+
+box-shadow:var(--shadow-sm);
+
+transition:.3s;
+
+position:relative;
+
+overflow:hidden;
+
+}
+
+
+
+.stat-box::before{
+
+content:"";
+
+position:absolute;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:4px;
+
+background:var(--gold);
+
+}
+
+
+
+.stat-box:hover{
+
+transform:translateY(-6px);
+
+box-shadow:var(--shadow-md);
+
+}
+
+
+
+.stat-box h3{
+
+font-size:14px;
+
+color:var(--text-secondary);
+
+margin-bottom:15px;
+
+}
+
+
+
+.stat-box h1{
+
+font-size:35px;
+
+color:var(--black);
+
+}
+
+
+
+/* =========================
+   GRID LAYOUT
+========================= */
+
+
+.dashboard-grid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:25px;
+
+}
 
 
 
@@ -97,29 +269,48 @@
    ATTENDANCE CARD
 ========================= */
 
+
 .attendance-card{
 
-    padding:25px;
+
+background:white;
+
+padding:30px;
+
+border-radius:22px;
+
+border-top:5px solid var(--gold);
+
+box-shadow:var(--shadow-sm);
 
 }
 
 
 
-.attendance-card h2{
+.attendance-card h2,
+.quick-actions h2,
+.section-card h2{
 
-    margin-bottom:20px;
+font-size:22px;
+
+margin-bottom:20px;
+
+color:var(--black);
 
 }
 
 
+
+/* BUTTONS */
 
 
 .attendance-buttons{
 
-    display:flex;
-    gap:15px;
+display:flex;
 
-    margin-bottom:25px;
+gap:15px;
+
+margin-bottom:25px;
 
 }
 
@@ -127,17 +318,17 @@
 
 .attendance-buttons button{
 
-    padding:12px 25px;
+padding:14px 25px;
 
-    border:none;
+border-radius:12px;
 
-    border-radius:10px;
+font-weight:700;
 
-    font-size:15px;
+border:none;
 
-    cursor:pointer;
+cursor:pointer;
 
-    font-weight:600;
+transition:.3s;
 
 }
 
@@ -145,9 +336,9 @@
 
 #checkInBtn{
 
-    background:#16a34a;
+background:#16a34a;
 
-    color:white;
+color:white;
 
 }
 
@@ -155,21 +346,32 @@
 
 #checkOutBtn{
 
-    background:#dc2626;
+background:#dc2626;
 
-    color:white;
+color:white;
 
 }
 
 
 
+.attendance-buttons button:hover{
+
+transform:translateY(-3px);
+
+}
+
+
+
+/* Attendance Info */
+
+
 .attendance-info{
 
-    display:grid;
+display:grid;
 
-    grid-template-columns:repeat(3,1fr);
+grid-template-columns:repeat(3,1fr);
 
-    gap:15px;
+gap:15px;
 
 }
 
@@ -177,15 +379,13 @@
 
 .attendance-info p{
 
-    background:#f8fafc;
+background:#f8f8f8;
 
-    padding:15px;
+padding:18px;
 
-    border-radius:10px;
+border-radius:14px;
 
-    margin:0;
-
-    font-size:14px;
+font-size:14px;
 
 }
 
@@ -193,63 +393,78 @@
 
 .attendance-info span{
 
-    display:block;
+display:block;
 
-    margin-top:8px;
+font-size:20px;
 
-    font-weight:700;
+font-weight:700;
 
-    font-size:18px;
+margin-top:8px;
+
+color:var(--gold);
 
 }
 
 
 
 /* =========================
-   STATS CARDS
+   QUICK ACTIONS
 ========================= */
 
 
-.stats-container{
+.quick-actions{
 
-    display:grid;
+background:#111;
 
-    grid-template-columns:repeat(3,1fr);
+padding:30px;
 
-    gap:20px;
+border-radius:22px;
 
-}
-
-
-
-.stats-container .card{
-
-    padding:25px;
-
-    text-align:center;
+box-shadow:var(--shadow-lg);
 
 }
 
 
 
-.stats-container h3{
+.quick-actions h2{
 
-    color:#6b7280;
-
-    font-size:15px;
+color:white;
 
 }
 
 
 
-.stats-container h1{
+.quick-actions button{
 
-    margin-top:15px;
+width:100%;
 
-    font-size:32px;
+margin-bottom:15px;
+
+padding:14px;
+
+border-radius:12px;
+
+border:1px solid rgba(255,255,255,.2);
+
+background:white;
+
+color:black;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:.3s;
 
 }
 
+
+
+.quick-actions button:hover{
+
+background:var(--gold);
+
+}
 
 
 
@@ -260,15 +475,15 @@
 
 .section-card{
 
-    padding:25px;
+background:white;
 
-}
+padding:30px;
 
+border-radius:22px;
 
+box-shadow:var(--shadow-sm);
 
-.section-card h2{
-
-    margin-bottom:20px;
+border-left:5px solid var(--gold);
 
 }
 
@@ -277,13 +492,30 @@
 #taskList,
 #announcementPreview{
 
-    background:#f8fafc;
 
-    padding:20px;
+background:#f8f8f8;
 
-    border-radius:12px;
+padding:20px;
 
-    color:#6b7280;
+border-radius:15px;
+
+min-height:80px;
+
+color:var(--text-secondary);
+
+}
+
+
+
+/* =========================
+   EMPTY STATES
+========================= */
+
+
+#taskList p,
+#announcementPreview p{
+
+margin:0;
 
 }
 
@@ -294,28 +526,44 @@
 ========================= */
 
 
+@media(max-width:1100px){
+
+
+.stats-container{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+
+}
+
+
+
 @media(max-width:900px){
 
 
-    .stats-container{
+.dashboard-grid{
 
-        grid-template-columns:1fr;
+grid-template-columns:1fr;
 
-    }
-
-
-    .attendance-info{
-
-        grid-template-columns:1fr;
-
-    }
+}
 
 
-    .attendance-buttons{
+.attendance-info{
 
-        flex-direction:column;
+grid-template-columns:1fr;
 
-    }
+}
+
+
+.profile-hero{
+
+flex-direction:column;
+
+text-align:center;
+
+}
 
 
 }
@@ -325,13 +573,25 @@
 @media(max-width:600px){
 
 
-    .profile-summary{
+.stats-container{
 
-        flex-direction:column;
+grid-template-columns:1fr;
 
-        text-align:center;
+}
 
-    }
+
+.attendance-buttons{
+
+flex-direction:column;
+
+}
+
+
+.profile-details h2{
+
+font-size:24px;
+
+}
 
 
 }
