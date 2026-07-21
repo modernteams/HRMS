@@ -1,33 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
+
 <link rel="stylesheet" href="css/variables.css">
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/login.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/employee-profile.css">
 
 <meta charset="UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
 <title>
-Modern Teams - Login
+Modern Teams - Employee Profile
 </title>
 
-
 </head>
-
 
 
 <body>
 
 
+<div class="employee-layout">
 
 
 
-<div class="login-container">
+<!-- ======================
+     SIDEBAR
+     NO CHANGE
+====================== -->
+
+
+<aside class="sidebar">
+
+
+<div class="logo">
+
+<img src="assets/logo/mt-logo.jpeg" alt="Logo">
+
+<h2>
+Modern Teams
+</h2>
+
+</div>
+
+
+
+<nav class="menu">
+
+
+<a href="employee.html">
+🏠 Dashboard
+</a>
+
+
+<a href="employee-attendance.html">
+🕒 My Attendance
+</a>
+
+
+<a href="employee-leaves.html">
+📄 My Leaves
+</a>
+
+
+<a href="employee-announcements.html">
+📢 Announcements
+</a>
+
+
+<a class="active" href="employee-profile.html">
+⚙ Profile
+</a>
+
+
+
+<a href="login.html" onclick="logout()">
+🚪 Logout
+</a>
+
+
+</nav>
+
+
+</aside>
+
+
+
 
 
 
@@ -35,31 +96,145 @@ Modern Teams - Login
 
 
 <!-- ======================
-     BRAND SECTION
+     MAIN CONTENT
 ====================== -->
 
 
-<div class="login-brand">
-
-
-
-<img 
-src="assets/logo/mt-logo.jpeg"
-alt="Modern Teams Logo">
+<main class="main-content">
 
 
 
 
+
+<header class="topbar">
+
+
+<div>
 
 <h1>
-Modern Teams
+My Profile
 </h1>
 
 
-
 <p>
-HR Management System
+Manage your personal information
 </p>
+
+
+</div>
+
+
+
+
+<div class="employee-info">
+
+
+<div class="notification">
+
+🔔
+
+</div>
+
+
+<div class="avatar">
+
+E
+
+</div>
+
+
+</div>
+
+
+</header>
+
+
+
+
+
+
+
+
+
+<section class="profile-section">
+
+
+
+
+
+<!-- ======================
+     PROFILE BANNER
+====================== -->
+
+
+<div class="profile-banner">
+
+
+
+<div class="profile-photo-box">
+
+
+<img
+id="employeePhoto"
+src="assets/images/default-user.png"
+alt="Employee Photo">
+
+
+
+<label class="change-photo">
+
+Change Photo
+
+<input
+type="file"
+id="profilePhoto"
+accept="image/*">
+
+</label>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="profile-basic">
+
+
+<h2 id="employeeName">
+
+Employee Name
+
+</h2>
+
+<p id="employeeDesignation">
+
+Designation
+
+</p>
+
+
+
+<p id="employeeDepartment">
+
+Department
+
+</p>
+
+
+
+<span class="status-badge">
+
+🟢 Active Employee
+
+</span>
+
+
+
+</div>
 
 
 
@@ -74,25 +249,39 @@ HR Management System
 
 
 <!-- ======================
-     LOGIN BOX
+     PROFILE + COMPANY
 ====================== -->
 
 
-<div class="login-box">
+<div class="profile-grid">
 
+
+
+
+
+
+
+<!-- UPDATE PROFILE -->
+
+
+<div class="profile-card">
 
 
 <h2>
-Welcome Back 👋
+Update Profile
 </h2>
 
 
 
-<p>
-Login to continue
-</p>
+<label>
+Full Name
+</label>
 
 
+<input
+type="text"
+id="name"
+placeholder="Enter Name">
 
 
 
@@ -106,46 +295,150 @@ Email
 <input
 type="email"
 id="email"
-placeholder="Enter Email">
-
-
+readonly>
 
 
 
 
 
 <label>
-Password
+Phone Number
 </label>
-<div class="password-field">
-
-<input 
-type="password"
-id="password"
-placeholder="Password">
 
 
-<span 
-class="eye-icon"
-onclick="togglePassword('password', this)">
-👁
+<input
+type="text"
+id="phone"
+placeholder="Phone Number">
+
+
+
+
+
+<label>
+Address
+</label>
+
+
+<textarea
+id="address"
+placeholder="Enter Address">
+</textarea>
+
+
+
+
+
+<button id="updateProfileBtn">
+
+Update Profile
+
+</button>
+
+
+
+<p id="profileMessage"></p>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- COMPANY DETAILS -->
+
+
+<div class="company-card">
+
+
+<h2>
+Company Details
+</h2>
+
+
+
+
+
+<div class="company-info">
+
+
+
+<div>
+
+<p>
+Department
+</p>
+
+<span id="department">
+--
 </span>
 
 </div>
 
-<button id="loginBtn" class="btn btn-primary">
-    Login
-</button>
-<div class="forgot-password">
 
-<a href="forgot-password.html">
-Forgot Password?
-</a>
+
+
+
+<div>
+
+<p>
+Designation
+</p>
+
+<span id="designation">
+--
+</span>
 
 </div>
-<p id="message"></p>
+
+
+
+
+
+
+<div>
+
+<p>
+Joining Date
+</p>
+
+<span id="joiningDate">
+--
+</span>
 
 </div>
+
+
+
+
+
+
+<div>
+
+<p>
+Employee ID
+</p>
+
+<span id="employeeId">
+--
+</span>
+
+</div>
+
+
+
+</div>
+
+
+
+</div>
+
+
 
 
 
@@ -160,15 +453,73 @@ Forgot Password?
 
 
 <!-- ======================
-     SCRIPTS
+     SECURITY
 ====================== -->
+
+
+<div class="security-card">
+
+
+<h2>
+🔐 Security
+</h2>
+
+
+
+<input
+type="password"
+id="newPassword"
+placeholder="Enter New Password">
+
+
+
+
+
+<button id="changePasswordBtn">
+
+Change Password
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+</section>
+
+
+
+
+
+
+</main>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="js/supabase.js"></script>
 
-<script src="js/login.js"></script>
+<script src="js/auth.js"></script>
 
-<script src="js/password-toggle.js"></script>
+<script src="js/employee-profile.js"></script>
+
+
 
 </body>
 
