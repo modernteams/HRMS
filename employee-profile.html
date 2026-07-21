@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/employee-profile.css">
+<link rel="stylesheet" href="css/employee-dashboard.css">
 
 <meta charset="UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>
-Modern Teams - Employee Profile
+Modern Teams - Employee Dashboard
 </title>
 
 </head>
@@ -23,13 +23,12 @@ Modern Teams - Employee Profile
 <body>
 
 
-<div class="employee-layout">
+<div class="app-layout">
 
 
 
 <!-- ======================
      SIDEBAR
-     NO CHANGE
 ====================== -->
 
 
@@ -38,11 +37,14 @@ Modern Teams - Employee Profile
 
 <div class="logo">
 
+
 <img src="assets/logo/mt-logo.jpeg" alt="Logo">
+
 
 <h2>
 Modern Teams
 </h2>
+
 
 </div>
 
@@ -51,7 +53,7 @@ Modern Teams
 <nav class="menu">
 
 
-<a href="employee.html">
+<a class="active" href="employee.html">
 🏠 Dashboard
 </a>
 
@@ -71,10 +73,9 @@ Modern Teams
 </a>
 
 
-<a class="active" href="employee-profile.html">
+<a href="employee-profile.html">
 ⚙ Profile
 </a>
-
 
 
 <a href="login.html" onclick="logout()">
@@ -93,8 +94,6 @@ Modern Teams
 
 
 
-
-
 <!-- ======================
      MAIN CONTENT
 ====================== -->
@@ -106,18 +105,28 @@ Modern Teams
 
 
 
+<!-- ======================
+     TOP HEADER
+====================== -->
+
+
 <header class="topbar">
 
 
-<div>
+<div class="employee-heading">
 
-<h1>
-My Profile
+
+<h1 id="greetingText">
+
+Good Morning, Employee 👋
+
 </h1>
 
 
 <p>
-Manage your personal information
+
+Modern Teams HRMS
+
 </p>
 
 
@@ -126,14 +135,34 @@ Manage your personal information
 
 
 
+
 <div class="employee-info">
+
+<div class="notification-wrapper"
+onclick="openNotifications()">
+
 
 
 <div class="notification">
 
+
 🔔
 
+
+<span 
+id="notificationCount"
+class="notification-badge">
+</span>
+
+
+
 </div>
+
+
+</div>
+
+
+
 
 
 <div class="avatar">
@@ -141,6 +170,7 @@ Manage your personal information
 E
 
 </div>
+
 
 
 </div>
@@ -156,41 +186,30 @@ E
 
 
 
-<section class="profile-section">
+<section class="content dashboard">
+
+
 
 
 
 
 
 <!-- ======================
-     PROFILE BANNER
+     PROFILE HERO
 ====================== -->
 
 
-<div class="profile-banner">
+<div class="profile-hero">
 
 
 
-<div class="profile-photo-box">
+<div class="profile-image">
 
 
-<img
+<img 
 id="employeePhoto"
 src="assets/images/default-user.png"
 alt="Employee Photo">
-
-
-
-<label class="change-photo">
-
-Change Photo
-
-<input
-type="file"
-id="profilePhoto"
-accept="image/*">
-
-</label>
 
 
 </div>
@@ -199,9 +218,8 @@ accept="image/*">
 
 
 
+<div class="profile-details">
 
-
-<div class="profile-basic">
 
 
 <h2 id="employeeName">
@@ -209,6 +227,8 @@ accept="image/*">
 Employee Name
 
 </h2>
+
+
 
 <p id="employeeDesignation">
 
@@ -226,6 +246,7 @@ Department
 
 
 
+
 <span class="status-badge">
 
 🟢 Active Employee
@@ -238,6 +259,7 @@ Department
 
 
 
+
 </div>
 
 
@@ -249,95 +271,25 @@ Department
 
 
 <!-- ======================
-     PROFILE + COMPANY
+     STATS
 ====================== -->
 
 
-<div class="profile-grid">
+<div class="stats-container">
 
 
 
+<div class="stat-box">
 
 
+<h3>
+Today's Status
+</h3>
 
 
-<!-- UPDATE PROFILE -->
-
-
-<div class="profile-card">
-
-
-<h2>
-Update Profile
-</h2>
-
-
-
-<label>
-Full Name
-</label>
-
-
-<input
-type="text"
-id="name"
-placeholder="Enter Name">
-
-
-
-
-
-<label>
-Email
-</label>
-
-
-<input
-type="email"
-id="email"
-readonly>
-
-
-
-
-
-<label>
-Phone Number
-</label>
-
-
-<input
-type="text"
-id="phone"
-placeholder="Phone Number">
-
-
-
-
-
-<label>
-Address
-</label>
-
-
-<textarea
-id="address"
-placeholder="Enter Address">
-</textarea>
-
-
-
-
-
-<button id="updateProfileBtn">
-
-Update Profile
-
-</button>
-
-
-
-<p id="profileMessage"></p>
+<h1>
+Present
+</h1>
 
 
 </div>
@@ -347,36 +299,20 @@ Update Profile
 
 
 
+<div class="card stat-box">
 
 
-
-<!-- COMPANY DETAILS -->
-
-
-<div class="company-card">
+<h3>
+Working Hours
+</h3>
 
 
-<h2>
-Company Details
-</h2>
+<h1 id="workingHours">
 
+0
 
+</h1>
 
-
-
-<div class="company-info">
-
-
-
-<div>
-
-<p>
-Department
-</p>
-
-<span id="department">
---
-</span>
 
 </div>
 
@@ -384,15 +320,21 @@ Department
 
 
 
-<div>
 
-<p>
-Designation
-</p>
+<div class="card stat-box">
 
-<span id="designation">
---
-</span>
+
+<h3>
+Remaining Leaves
+</h3>
+
+
+<h1 id="leaveCount">
+
+0
+
+</h1>
+
 
 </div>
 
@@ -401,43 +343,22 @@ Designation
 
 
 
-<div>
-
-<p>
-Joining Date
-</p>
-
-<span id="joiningDate">
---
-</span>
-
-</div>
+<div class="card stat-box">
 
 
+<h3>
+Performance Score
+</h3>
 
 
+<h1 id="performanceScore">
 
+0%
 
-<div>
-
-<p>
-Employee ID
-</p>
-
-<span id="employeeId">
---
-</span>
-
-</div>
-
+</h1>
 
 
 </div>
-
-
-
-</div>
-
 
 
 
@@ -453,37 +374,268 @@ Employee ID
 
 
 <!-- ======================
-     SECURITY
+     ATTENDANCE + ACTION
 ====================== -->
 
 
-<div class="security-card">
+<div class="dashboard-grid">
+
+
+
+
+
+<div class="attendance-card">
 
 
 <h2>
-🔐 Security
+
+Today's Attendance
+
 </h2>
 
 
 
-<input
-type="password"
-id="newPassword"
-placeholder="Enter New Password">
+
+<div class="attendance-buttons">
 
 
 
+<button id="checkInBtn">
 
-
-<button id="changePasswordBtn">
-
-Change Password
+✅ Check In
 
 </button>
 
 
 
+
+<button id="checkOutBtn">
+
+🚪 Check Out
+
+</button>
+
+
+
+
 </div>
+
+
+
+
+
+
+
+<div class="attendance-info">
+
+
+
+<p>
+
+Check In
+
+<span id="checkInTime">
+
+--
+
+</span>
+
+</p>
+
+
+
+
+
+<p>
+
+Check Out
+
+<span id="checkOutTime">
+
+--
+
+</span>
+
+</p>
+
+
+
+
+
+<p>
+
+Status
+
+<span>
+
+Present
+
+</span>
+
+</p>
+
+
+
+
+</div>
+
+
+
+
+
+<p id="attendanceMessage"></p>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="quick-actions">
+
+
+
+<h2>
+
+Quick Actions
+
+</h2>
+
+
+<button>
+<a href="employee-leaves.html">
+
+📝 Apply Leave
+
+</a>
+</button>
+
+<button>
+<a href="employee-announcements.html">
+
+📢 View Announcements
+
+</a>
+</button>
+
+<button>
+<a href="employee-profile.html">
+
+👤 Update Profile
+
+</a>
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- ======================
+     TASK + ANNOUNCEMENT
+====================== -->
+
+
+
+<div class="dashboard-grid">
+
+
+
+
+
+<div class="section-card">
+
+
+<h2>
+
+My Tasks
+
+</h2>
+
+
+<h3 id="taskCountText">
+0
+</h3>
+
+<div id="taskList">
+
+
+<p>
+No tasks assigned
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="card section-card">
+
+
+<h2>
+
+Latest Announcements
+
+</h2>
+
+
+
+
+<div id="announcementPreview">
+
+
+<p>
+
+No announcements
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
 
 
 
@@ -496,14 +648,13 @@ Change Password
 
 
 
-
 </main>
 
 
 
 
-</div>
 
+</div>
 
 
 
@@ -517,7 +668,16 @@ Change Password
 
 <script src="js/auth.js"></script>
 
-<script src="js/employee-profile.js"></script>
+<script src="js/employee-dashboard.js"></script>
+
+<script src="js/notification.js"></script>
+
+
+<script>
+
+employeeGuard();
+
+</script>
 
 
 
