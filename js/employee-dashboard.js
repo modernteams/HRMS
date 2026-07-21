@@ -5,10 +5,10 @@ let currentEmployee = null;
 async function loadEmployeeDashboard(){
 
 // ===============================
-// DYNAMIC GREETING
+// DYNAMIC USER GREETING
 // ===============================
 
-function updateGreeting(){
+async function updateGreeting(){
 
 const greetingElement = 
 document.getElementById("greetingText");
@@ -22,47 +22,85 @@ if(!greetingElement){
 const hour = new Date().getHours();
 
 
-let greeting = "";
+let greeting="";
 
 
 if(hour >= 5 && hour < 12){
 
-    greeting = "Good Morning";
+    greeting="Good Morning";
 
 }
 
 else if(hour >= 12 && hour < 17){
 
-    greeting = "Good Afternoon";
+    greeting="Good Afternoon";
 
 }
 
 else if(hour >= 17 && hour < 21){
 
-    greeting = "Good Evening";
+    greeting="Good Evening";
 
 }
 
 else{
 
-    greeting = "Good Night";
+    greeting="Good Night";
+
+}
+
+
+
+// get logged in user
+
+const {data:{user}} = 
+await supabaseClient.auth.getUser();
+
+
+
+let userName="User";
+
+
+
+if(user){
+
+
+const {data:profile,error}=
+
+await supabaseClient
+
+.from("profiles")
+
+.select("full_name")
+
+.eq("id",user.id)
+
+.single();
+
+
+
+if(profile){
+
+userName = profile.full_name;
+
+}
+
 
 }
 
 
 
 greetingElement.innerHTML =
-`${greeting}, Employee 👋`;
+
+`${greeting}, ${userName} 👋`;
 
 
 }
 
 
 
-// Run when page loads
-
 updateGreeting();
-
+    
 const user =
 await supabaseClient.auth.getUser();
 
