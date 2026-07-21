@@ -8,6 +8,64 @@ async function loadAdminDashboard(){
 
 
 console.log("Admin Dashboard Loading...");
+  // ===============================
+// DYNAMIC GREETING
+// ===============================
+
+function updateGreeting(){
+
+const greetingElement = 
+document.getElementById("greetingText");
+
+
+if(!greetingElement){
+    return;
+}
+
+
+const hour = new Date().getHours();
+
+
+let greeting = "";
+
+
+if(hour >= 5 && hour < 12){
+
+    greeting = "Good Morning";
+
+}
+
+else if(hour >= 12 && hour < 17){
+
+    greeting = "Good Afternoon";
+
+}
+
+else if(hour >= 17 && hour < 21){
+
+    greeting = "Good Evening";
+
+}
+
+else{
+
+    greeting = "Good Night";
+
+}
+
+
+
+greetingElement.innerHTML =
+`${greeting}, Admin 👋`;
+
+
+}
+
+
+
+// Run when page loads
+
+updateGreeting();
 
 
 
