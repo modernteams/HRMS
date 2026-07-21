@@ -3,7 +3,7 @@
 
 <head>
 
-     <link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/variables.css">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
@@ -22,37 +22,31 @@
 <body>
 
 
-<!-- ======================
-     ADMIN LAYOUT
-====================== -->
-
-
 <div class="app-layout">
 
 
 
-<!-- ======================
-     SIDEBAR
-====================== -->
+<!-- SIDEBAR SAME -->
+
+
 <button id="menuToggle" class="menu-toggle">
-
 ☰
-
 </button>
 
+
 <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
 
 <aside class="sidebar">
 
 
 <div class="logo">
 
-<img src="assets/logo/mt-logo.jpeg" alt="Modern Teams Logo">
+<img src="assets/logo/mt-logo.jpeg">
 
 <h2>
 Modern Teams
 </h2>
-
 
 </div>
 
@@ -61,7 +55,7 @@ Modern Teams
 <nav class="menu">
 
 
-<a href="admin.html">
+<a class="active" href="admin.html">
 🏠 Dashboard
 </a>
 
@@ -91,7 +85,6 @@ Modern Teams
 </a>
 
 
-
 <a href="login.html" onclick="logout()">
 🚪 Logout
 </a>
@@ -107,16 +100,10 @@ Modern Teams
 
 
 
-<!-- ======================
-     MAIN SECTION
-====================== -->
-
-
 <main class="main-content">
 
 
 
-<!-- HEADER -->
 
 
 <header class="topbar">
@@ -125,7 +112,7 @@ Modern Teams
 <div>
 
 <h1>
-Dashboard
+Admin Dashboard
 </h1>
 
 
@@ -140,29 +127,31 @@ Modern Teams HRMS
 
 <div class="admin-info">
 
+
 <div class="notification-wrapper">
+
 
 <div class="notification" onclick="openNotifications()">
 
-    🔔
+🔔
 
-    <span id="notificationCount" class="notification-badge">
-        0
-    </span>
+<span id="notificationCount" class="notification-badge">
+0
+</span>
+
+</div>
+
 
 </div>
 
-</div>
+
 
 <div class="avatar">
-
 MT
-
 </div>
 
 
 </div>
-
 
 
 </header>
@@ -174,17 +163,13 @@ MT
 
 
 
-<!-- ======================
-     DASHBOARD CONTENT
-====================== -->
-
-
 <section class="content admin-dashboard">
 
 
 
-<!-- WELCOME -->
 
+
+<!-- WELCOME -->
 
 <div class="admin-welcome">
 
@@ -195,7 +180,7 @@ Good Morning, Admin 👋
 
 
 <p>
-Welcome back to Modern Teams HR Management System
+Manage employees, attendance and company operations
 </p>
 
 
@@ -208,57 +193,49 @@ Welcome back to Modern Teams HR Management System
 
 
 
-<!-- STATS -->
 
+<!-- STATS -->
 
 <div class="stats-container">
 
 
 
-<div class="card stats-card">
-
+<div class="card stats-card employees-card">
 
 <h3>
-Total Employees
+👥 Total Employees
 </h3>
-
 
 <h1 id="totalEmployees">
 0
 </h1>
 
-
 </div>
 
 
 
 
-
-<div class="card stats-card">
-
+<div class="card stats-card present-card">
 
 <h3>
-Present Today
+🟢 Present Today
 </h3>
-
 
 <h1 id="presentToday">
 0
 </h1>
 
-
 </div>
 
 
 
 
 
-
-<div class="card stats-card">
+<div class="card stats-card leave-card">
 
 
 <h3>
-Pending Leaves
+📄 Pending Leaves
 </h3>
 
 
@@ -273,12 +250,11 @@ Pending Leaves
 
 
 
-
-<div class="card stats-card">
+<div class="card stats-card department-card">
 
 
 <h3>
-Departments
+🏢 Departments
 </h3>
 
 
@@ -291,6 +267,7 @@ Departments
 
 
 
+
 </div>
 
 
@@ -301,25 +278,38 @@ Departments
 
 
 
-<!-- ANALYTICS -->
+<!-- GRAPH + ACTIVITY -->
 
 
 <div class="dashboard-section">
 
 
 
+
+
 <div class="card chart-box">
 
 
+<div class="section-header">
+
 <h2>
-Attendance Overview
+Attendance Analytics
 </h2>
+
+<span>
+Last 7 Days
+</span>
+
+</div>
 
 
 <canvas id="attendanceChart"></canvas>
 
 
 </div>
+
+
+
 
 
 
@@ -336,11 +326,140 @@ Recent Activity
 <div id="recentActivity">
 
 
+<div class="activity-item">
+👤 New employee activity
+</div>
+
+
+<div class="activity-item">
+🕒 Attendance update
+</div>
+
+
+<div class="activity-item">
+📢 Announcement created
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- DEPARTMENT + INSIGHTS -->
+
+
+<div class="dashboard-section secondary-section">
+
+
+
+
+
+<div class="card department-box">
+
+
+<h2>
+Department Overview
+</h2>
+
+
+<div class="department-list">
+
+
+<div>
+<span>IT</span>
+<div class="progress">
+<div class="progress-fill" style="width:80%"></div>
+</div>
+</div>
+
+
+
+<div>
+<span>HR</span>
+<div class="progress">
+<div class="progress-fill" style="width:40%"></div>
+</div>
+</div>
+
+
+
+<div>
+<span>Sales</span>
+<div class="progress">
+<div class="progress-fill" style="width:65%"></div>
+</div>
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="card insight-box">
+
+
+<h2>
+Attendance Insights
+</h2>
+
+
+
+<div class="insight-grid">
+
+
+<div>
+<h3>
+Leaves Used
+</h3>
 <p>
-No activity yet
+45
 </p>
+</div>
 
 
+
+<div>
+<h3>
+Late Check-ins
+</h3>
+<p>
+8
+</p>
+</div>
+
+
+
+<div>
+<h3>
+Avg Hours
+</h3>
+<p>
+7.8h
+</p>
 </div>
 
 
@@ -348,9 +467,14 @@ No activity yet
 </div>
 
 
-
 </div>
 
+
+
+
+
+
+</div>
 
 
 
@@ -375,23 +499,42 @@ Quick Actions
 <div class="quick-buttons">
 
 
-<button class="btn btn-primary">
-Add Employee
+
+<button onclick="location.href='admin-employees.html'"
+class="btn btn-primary">
+
++ Add Employee
+
 </button>
 
 
-<button class="btn btn-primary">
-Create Announcement
+
+<button onclick="location.href='admin-announcements.html'"
+class="btn btn-primary">
+
+📢 Announcement
+
 </button>
 
 
-<button class="btn btn-primary">
-Manage Leaves
+
+
+<button onclick="location.href='admin-leaves.html'"
+class="btn btn-primary">
+
+Approve Leaves
+
 </button>
 
 
-<button class="btn btn-primary">
-View Reports
+
+
+
+<button onclick="location.href='admin-attendance.html'"
+class="btn btn-primary">
+
+Attendance Report
+
 </button>
 
 
@@ -399,7 +542,12 @@ View Reports
 </div>
 
 
+
 </div>
+
+
+
+
 
 
 
@@ -408,16 +556,19 @@ View Reports
 </section>
 
 
-
 </main>
-
 
 
 
 </div>
 
 
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script src="js/supabase.js"></script>
 
@@ -426,14 +577,17 @@ View Reports
 <script src="js/admin-dashboard.js"></script>
 
 <script src="js/sidebar.js"></script>
+
 <script src="js/notification.js"></script>
+
 
 <script>
 
 adminGuard();
 
 </script>
-</body>
 
+
+</body>
 
 </html>
