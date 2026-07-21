@@ -1,93 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
 
+<head>
 <link rel="stylesheet" href="css/variables.css">
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/employee-dashboard.css">
+<link rel="stylesheet" href="css/login.css">
 
 <meta charset="UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
 <title>
-Modern Teams - Employee Dashboard
+Modern Teams - Login
 </title>
 
+
 </head>
+
 
 
 <body>
 
 
-<div class="app-layout">
 
 
 
-<!-- ======================
-     SIDEBAR
-====================== -->
-
-
-<aside class="sidebar">
-
-
-<div class="logo">
-
-
-<img src="assets/logo/mt-logo.jpeg" alt="Logo">
-
-
-<h2>
-Modern Teams
-</h2>
-
-
-</div>
-
-
-
-<nav class="menu">
-
-
-<a class="active" href="employee.html">
-🏠 Dashboard
-</a>
-
-
-<a href="employee-attendance.html">
-🕒 My Attendance
-</a>
-
-
-<a href="employee-leaves.html">
-📄 My Leaves
-</a>
-
-
-<a href="employee-announcements.html">
-📢 Announcements
-</a>
-
-
-<a href="employee-profile.html">
-⚙ Profile
-</a>
-
-
-<a href="login.html" onclick="logout()">
-🚪 Logout
-</a>
-
-
-</nav>
-
-
-</aside>
-
+<div class="login-container">
 
 
 
@@ -95,271 +35,31 @@ Modern Teams
 
 
 <!-- ======================
-     MAIN CONTENT
+     BRAND SECTION
 ====================== -->
 
 
-<main class="main-content">
+<div class="login-brand">
 
-
-
-
-
-<!-- ======================
-     TOP HEADER
-====================== -->
-
-
-<header class="topbar">
-
-
-<div class="employee-heading">
-
-
-<h1 id="greetingText">
-
-Good Morning, Employee 👋
-
-</h1>
-
-
-<p>
-
-Modern Teams HRMS
-
-</p>
-
-
-</div>
-
-
-
-
-
-<div class="employee-info">
-
-<div class="notification-wrapper"
-onclick="openNotifications()">
-
-
-
-<div class="notification">
-
-
-🔔
-
-
-<span 
-id="notificationCount"
-class="notification-badge">
-</span>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-<div class="avatar">
-
-E
-
-</div>
-
-
-
-</div>
-
-
-</header>
-
-
-
-
-
-
-
-
-
-<section class="content dashboard">
-
-
-
-
-
-
-
-<!-- ======================
-     PROFILE HERO
-====================== -->
-
-
-<div class="profile-hero">
-
-
-
-<div class="profile-image">
 
 
 <img 
-id="employeePhoto"
-src="assets/images/default-user.png"
-alt="Employee Photo">
-
-
-</div>
+src="assets/logo/mt-logo.jpeg"
+alt="Modern Teams Logo">
 
 
 
-
-
-<div class="profile-details">
-
-
-
-<h2 id="employeeName">
-
-Employee Name
-
-</h2>
-
-
-
-<p id="employeeDesignation">
-
-Designation
-
-</p>
-
-
-
-<p id="employeeDepartment">
-
-Department
-
-</p>
-
-
-
-
-<span class="status-badge">
-
-🟢 Active Employee
-
-</span>
-
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- ======================
-     STATS
-====================== -->
-
-
-<div class="stats-container">
-
-
-
-<div class="stat-box">
-
-
-<h3>
-Today's Status
-</h3>
 
 
 <h1>
-Present
+Modern Teams
 </h1>
 
 
-</div>
 
-
-
-
-
-
-<div class="card stat-box">
-
-
-<h3>
-Working Hours
-</h3>
-
-
-<h1 id="workingHours">
-
-0
-
-</h1>
-
-
-</div>
-
-
-
-
-
-
-<div class="card stat-box">
-
-
-<h3>
-Remaining Leaves
-</h3>
-
-
-<h1 id="leaveCount">
-
-0
-
-</h1>
-
-
-</div>
-
-
-
-
-
-
-<div class="card stat-box">
-
-
-<h3>
-Performance Score
-</h3>
-
-
-<h1 id="performanceScore">
-
-0%
-
-</h1>
-
-
-</div>
-
+<p>
+HR Management System
+</p>
 
 
 
@@ -374,173 +74,78 @@ Performance Score
 
 
 <!-- ======================
-     ATTENDANCE + ACTION
+     LOGIN BOX
 ====================== -->
 
 
-<div class="dashboard-grid">
-
-
-
-
-
-<div class="attendance-card">
-
-
-<h2>
-
-Today's Attendance
-
-</h2>
-
-
-
-
-<div class="attendance-buttons">
-
-
-
-<button id="checkInBtn">
-
-✅ Check In
-
-</button>
-
-
-
-
-<button id="checkOutBtn">
-
-🚪 Check Out
-
-</button>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-<div class="attendance-info">
-
-
-
-<p>
-
-Check In
-
-<span id="checkInTime">
-
---
-
-</span>
-
-</p>
-
-
-
-
-
-<p>
-
-Check Out
-
-<span id="checkOutTime">
-
---
-
-</span>
-
-</p>
-
-
-
-
-
-<p>
-
-Status
-
-<span>
-
-Present
-
-</span>
-
-</p>
-
-
-
-
-</div>
-
-
-
-
-
-<p id="attendanceMessage"></p>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="quick-actions">
+<div class="login-box">
 
 
 
 <h2>
-
-Quick Actions
-
+Welcome Back 👋
 </h2>
 
 
-<button>
-<a href="employee-leaves.html">
 
-📝 Apply Leave
+<p>
+Login to continue
+</p>
 
-</a>
-</button>
 
-<button>
-<a href="employee-announcements.html">
 
-📢 View Announcements
 
-</a>
-</button>
 
-<button>
-<a href="employee-profile.html">
 
-👤 Update Profile
 
-</a>
-</button>
+<label>
+Email
+</label>
 
+
+<input
+type="email"
+id="email"
+placeholder="Enter Email">
+
+
+
+
+
+
+
+<label>
+Password
+</label>
+<div class="password-field">
+
+<input 
+type="password"
+id="password"
+placeholder="Password">
+
+
+<span 
+class="eye-icon"
+onclick="togglePassword('password', this)">
+👁
+</span>
 
 </div>
 
+<button id="loginBtn" class="btn btn-primary">
+    Login
+</button>
+<div class="forgot-password">
 
+<a href="forgot-password.html">
+Forgot Password?
+</a>
 
+</div>
+<p id="message"></p>
 
+</div>
 
 
 
@@ -555,131 +160,15 @@ Quick Actions
 
 
 <!-- ======================
-     TASK + ANNOUNCEMENT
+     SCRIPTS
 ====================== -->
-
-
-
-<div class="dashboard-grid">
-
-
-
-
-
-<div class="section-card">
-
-
-<h2>
-
-My Tasks
-
-</h2>
-
-
-<h3 id="taskCountText">
-0
-</h3>
-
-<div id="taskList">
-
-
-<p>
-No tasks assigned
-</p>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-<div class="card section-card">
-
-
-<h2>
-
-Latest Announcements
-
-</h2>
-
-
-
-
-<div id="announcementPreview">
-
-
-<p>
-
-No announcements
-
-</p>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-</section>
-
-
-
-
-
-</main>
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="js/supabase.js"></script>
 
-<script src="js/auth.js"></script>
+<script src="js/login.js"></script>
 
-<script src="js/employee-dashboard.js"></script>
-
-<script src="js/notification.js"></script>
-
-
-<script>
-
-employeeGuard();
-
-</script>
-
-
+<script src="js/password-toggle.js"></script>
 
 </body>
 
