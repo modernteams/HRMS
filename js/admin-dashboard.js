@@ -8,7 +8,8 @@ async function loadAdminDashboard(){
 
 
 console.log("Admin Dashboard Loading...");
-  // ===============================
+
+// ===============================
 // DYNAMIC GREETING
 // ===============================
 
@@ -67,8 +68,6 @@ greetingElement.innerHTML =
 
 updateGreeting();
 
-
-
 // ===============================
 // TOTAL EMPLOYEES
 // ===============================
@@ -111,24 +110,20 @@ document.getElementById(
 
 const today =
 new Date()
-.toISOString()
-.split("T")[0];
+.toLocaleDateString("en-CA");
 
-
-
-const {data:attendance,error:attendanceError}=
-
-await supabaseClient
-
+const {data:attendance,error:attendanceError}=await supabaseClient
 .from("attendance")
-
 .select("*")
-
 .eq(
 "attendance_date",
 today
+)
+.not(
+"check_in",
+"is",
+null
 );
-
 
 
 if(attendanceError){
@@ -248,3 +243,234 @@ departments.length;
 
 
 loadAdminDashboard();
+// =================================
+// 7 DAYS ATTENDANCE LINE CHART
+// =================================
+
+async function loadAttendanceChart(){
+
+
+const today = new Date();
+
+let labels = [];
+let attendanceData = [];
+
+
+
+// Last 7 Days Calculate
+
+for(let i = 6; i >= 0; i--){
+
+
+let date = new Date();
+
+date.setDate(
+today.getDate() - i
+);
+
+
+let dateString =
+date.toLocaleDateString("en-CA");
+
+
+let dayName =
+date.toLocaleDateString(
+"en-IN",
+{
+weekday:"short"
+}
+);
+
+
+
+labels.push(dayName);
+
+
+
+
+// Attendance Count
+const {data,error}=await supabaseClient
+.from("attendance")
+.select("*")
+.eq(
+"attendance_date",
+dateString
+)
+.not(
+"check_in",
+"is",
+null
+);
+
+
+if(error){
+
+console.log(error);
+
+attendanceData.push(0);
+
+}
+else{
+
+attendanceData.push(
+data.length
+);
+
+
+}
+
+
+}
+
+
+
+
+
+
+const ctx =
+document.getElementById(
+"attendanceChart"
+);
+
+
+
+if(!ctx)
+return;
+
+
+
+new Chart(ctx,{
+
+type:"line",
+
+
+data:{
+
+
+labels:labels,
+
+
+datasets:[{
+
+
+label:"Present Employees",
+
+
+data:attendanceData,
+
+
+borderWidth:3,
+
+
+tension:0.4,
+
+
+fill:true,
+
+
+pointRadius:5,
+
+
+pointHoverRadius:8
+
+
+
+}]
+
+},
+
+
+
+
+options:{
+
+
+responsive:true,
+
+
+maintainAspectRatio:false,
+
+
+
+plugins:{
+
+
+legend:{
+
+
+display:true,
+
+
+position:"top"
+
+
+}
+
+
+},
+
+
+
+scales:{
+
+
+y:{
+
+
+beginAtZero:true,
+
+
+ticks:{
+
+
+stepSize:10
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+});
+
+
+
+}
+
+
+
+loadAttendanceChart();
+
+function autoRefreshAtMidnight(){
+
+const now = new Date();
+
+const midnight = new Date();
+
+midnight.setHours(24,0,0,0);
+
+const timeLeft = midnight - now;
+
+
+setTimeout(()=>{
+
+location.reload();
+
+},timeLeft);
+
+
+}
+
+
+autoRefreshAtMidnight();
