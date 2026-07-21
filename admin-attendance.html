@@ -37,13 +37,6 @@ Modern Teams - Attendance
      SIDEBAR
 ====================== -->
 
-<button id="menuToggle" class="menu-toggle">
-
-☰
-
-</button>
-
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
 
 <aside class="sidebar">
 
@@ -161,6 +154,13 @@ Track employee attendance
 
 <div class="admin-info">
 
+
+<div class="notification">
+🔔
+</div>
+
+
+
 <div class="avatar">
 MT
 </div>
@@ -192,55 +192,34 @@ MT
 
 <!-- FILTER AREA -->
 
-
-<div class="card filter-card">
-
-
-
-<h2>
-Attendance Filter
-</h2>
-
-
-
-
 <div class="filter-grid">
 
 
-
 <div>
-
 
 <label>
 Select Date
 </label>
 
-
 <input 
 type="date"
 id="attendanceDate">
-
 
 </div>
 
 
 
 
-
-
 <div>
-
 
 <label>
 Search Employee
 </label>
 
-
 <input 
 type="text"
 id="attendanceSearch"
-placeholder="Search employee">
-
+placeholder="Employee name">
 
 </div>
 
@@ -248,43 +227,67 @@ placeholder="Search employee">
 
 
 
-
 <div>
-
 
 <label>
 Department
 </label>
 
 
-
 <select id="attendanceDepartment">
 
-
-<option>
+<option value="">
 All Departments
 </option>
 
-
-<option>
+<option value="IT">
 IT
 </option>
 
-
-<option>
+<option value="HR">
 HR
 </option>
 
-
-<option>
+<option value="Marketing">
 Marketing
 </option>
 
-
-<option>
-Sales
+<option value="Finance">
+Finance
 </option>
 
+
+</select>
+
+
+</div>
+
+
+
+
+<div>
+
+<label>
+Status
+</label>
+
+
+<select id="attendanceStatus">
+
+
+<option value="">
+All Status
+</option>
+
+
+<option value="Present">
+Present
+</option>
+
+
+<option value="Absent">
+Absent
+</option>
 
 
 </select>
@@ -297,21 +300,17 @@ Sales
 
 </div>
 
+<div>
 
+<label>
 
+</label>
 
+<button id="attendanceSearchBtn" class="btn btn-primary">
+Search
+</button>
 
 </div>
-
-
-
-
-
-
-
-
-
-
 
 
 <!-- ATTENDANCE TABLE -->
@@ -460,9 +459,7 @@ No Attendance Found
 
 <script src="js/admin-attendance.js"></script>
 
-<script src="js/sidebar.js"></script>
 
-<script src="js/notification.js"></script>
 
 </body>
 
