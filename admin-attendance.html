@@ -161,12 +161,17 @@ Track employee attendance
 
 <div class="admin-info">
 
+<div class="notification" onclick="openNotifications()">
 
-<div class="notification">
-🔔
+    🔔
+
+    <span id="notificationCount" class="notification-badge">
+        0
+    </span>
+
 </div>
 
-
+</div>
 
 <div class="avatar">
 MT
@@ -466,9 +471,10 @@ No Attendance Found
 <script src="js/auth.js"></script>
 
 <script src="js/admin-attendance.js"></script>
-     <script src="js/sidebar.js"></script>
 
+<script src="js/sidebar.js"></script>
 
+<script src="js/notification.js"></script>
 
 </body>
 
