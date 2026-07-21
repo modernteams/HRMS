@@ -170,11 +170,19 @@ Create and manage company announcements
 
 <div class="admin-info">
 
+<div class="notification-wrapper">
 
-<div class="notification">
-🔔
+<div class="notification" onclick="openNotifications()">
+
+    🔔
+
+    <span id="notificationCount" class="notification-badge">
+        0
+    </span>
+
 </div>
 
+</div>
 
 
 <div class="avatar">
@@ -431,7 +439,7 @@ Announcements will appear here.
 <script src="js/admin-announcements.js"></script>
      <script src="js/sidebar.js"></script>
 
-
+  <script src="js/notification.js"></script>
 
 
 </body>
