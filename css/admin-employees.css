@@ -1,18 +1,17 @@
 /* =====================================
    MODERN TEAMS HRMS
    ADMIN EMPLOYEES CSS
-   Theme: Black White Gold
+   Theme: Black White Gold Premium
 ===================================== */
 
 
 
-/* =====================
-   PAGE CONTENT
-===================== */
+/* ==========================
+PAGE LAYOUT
+========================== */
 
 
 .content{
-
 
 display:flex;
 
@@ -20,6 +19,26 @@ flex-direction:column;
 
 gap:30px;
 
+}
+
+
+
+
+
+/* ==========================
+EMPLOYEE + ADMIN FORM WRAPPER
+========================== */
+
+
+.user-form-container{
+
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:25px;
+
 
 }
 
@@ -28,26 +47,42 @@ gap:30px;
 
 
 
-
-/* =====================
-   ADD EMPLOYEE FORM
-===================== */
+/* ==========================
+FORM CARD COMMON
+========================== */
 
 
 .form-card{
 
 
-background:white;
-
 padding:30px;
 
-border-radius:22px;
+
+border-radius:24px;
+
+
+background:white;
 
 
 box-shadow:var(--shadow-sm);
 
 
+transition:.3s;
+
+
 }
+
+
+
+.form-card:hover{
+
+
+transform:translateY(-3px);
+
+
+}
+
+
 
 
 
@@ -56,7 +91,11 @@ box-shadow:var(--shadow-sm);
 
 font-size:22px;
 
-margin-bottom:20px;
+
+margin-bottom:25px;
+
+
+font-weight:700;
 
 
 }
@@ -66,13 +105,22 @@ margin-bottom:20px;
 
 
 
+/* ==========================
+INPUTS
+========================== */
+
+
 .form-card input,
 .form-card select{
 
 
 width:100%;
 
+
 padding:14px 16px;
+
+
+margin-bottom:15px;
 
 
 border:1px solid #ddd;
@@ -82,6 +130,9 @@ border-radius:12px;
 
 
 font-size:15px;
+
+
+background:#fff;
 
 
 outline:none;
@@ -100,10 +151,67 @@ transition:.3s;
 .form-card select:focus{
 
 
-border-color:var(--gold);
+border-color:#d4af37;
 
 
-box-shadow:0 0 0 3px rgba(212,175,55,.15);
+box-shadow:
+0 0 0 3px rgba(212,175,55,.18);
+
+
+}
+
+
+
+
+
+
+/* ==========================
+EMPLOYEE BOX
+========================== */
+
+
+.employee-box{
+
+
+border-top:5px solid #2563eb;
+
+
+}
+
+
+
+.employee-box h2{
+
+
+color:#2563eb;
+
+
+}
+
+
+
+
+
+.employee-box .btn{
+
+
+background:#2563eb;
+
+
+color:white;
+
+
+}
+
+
+
+
+
+
+.employee-box .btn:hover{
+
+
+background:#1d4ed8;
 
 
 }
@@ -115,21 +223,126 @@ box-shadow:0 0 0 3px rgba(212,175,55,.15);
 
 
 
-/* =====================
-   ADD BUTTON
-===================== */
+/* ==========================
+ADMIN BOX
+========================== */
 
 
-#addEmployeeBtn{
+.admin-box{
 
 
-margin-top:10px;
-
-width:220px;
+border-top:5px solid #d4af37;
 
 
 }
 
+
+
+.admin-box h2{
+
+
+color:#111;
+
+
+}
+
+
+
+
+
+.admin-box .btn{
+
+
+background:#d4af37;
+
+
+color:#111;
+
+
+}
+
+
+
+.admin-box .btn:hover{
+
+
+background:#b8962e;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* ==========================
+BUTTON COMMON
+========================== */
+
+
+.btn{
+
+
+padding:13px 25px;
+
+
+border:none;
+
+
+border-radius:12px;
+
+
+cursor:pointer;
+
+
+font-weight:700;
+
+
+font-size:15px;
+
+
+transition:.3s;
+
+
+}
+
+
+
+
+.btn:hover{
+
+
+transform:translateY(-2px);
+
+
+}
+
+
+
+
+
+
+
+/* ==========================
+MESSAGES
+========================== */
+
+
+#employeeMessage,
+#adminMessage{
+
+
+margin-top:15px;
+
+
+font-weight:600;
+
+
+}
 
 
 
@@ -139,11 +352,6 @@ width:220px;
 #employeeMessage{
 
 
-margin-top:15px;
-
-font-weight:600;
-
-
 color:#166534;
 
 
@@ -151,19 +359,10 @@ color:#166534;
 
 
 
+#adminMessage{
 
 
-
-
-/* =====================
-   SEARCH BOX
-===================== */
-
-
-#searchEmployee{
-
-
-max-width:400px;
+color:#92400e;
 
 
 }
@@ -175,9 +374,77 @@ max-width:400px;
 
 
 
-/* =====================
-   TABLE CARD
-===================== */
+
+/* ==========================
+SEARCH
+========================== */
+
+
+.search-card{
+
+
+background:white;
+
+
+padding:25px;
+
+
+border-radius:22px;
+
+
+box-shadow:var(--shadow-sm);
+
+
+}
+
+
+
+#searchEmployee{
+
+
+width:100%;
+
+
+max-width:450px;
+
+
+padding:15px 18px;
+
+
+border-radius:12px;
+
+
+border:1px solid #ddd;
+
+
+font-size:15px;
+
+
+outline:none;
+
+
+}
+
+
+
+#searchEmployee:focus{
+
+
+border-color:#d4af37;
+
+
+}
+
+
+
+
+
+
+
+
+/* ==========================
+TABLE CARD
+========================== */
 
 
 .table-card{
@@ -185,10 +452,11 @@ max-width:400px;
 
 background:white;
 
+
 padding:30px;
 
 
-border-radius:22px;
+border-radius:24px;
 
 
 box-shadow:var(--shadow-sm);
@@ -201,10 +469,14 @@ overflow-x:auto;
 
 
 
+
 .table-card h2{
 
 
 margin-bottom:20px;
+
+
+font-size:22px;
 
 
 }
@@ -215,10 +487,9 @@ margin-bottom:20px;
 
 
 
-
-/* =====================
-   EMPLOYEE TABLE
-===================== */
+/* ==========================
+TABLE
+========================== */
 
 
 table{
@@ -226,11 +497,11 @@ table{
 
 width:100%;
 
+
 border-collapse:collapse;
 
 
 }
-
 
 
 
@@ -244,15 +515,17 @@ background:#111;
 
 
 
-
 thead th{
 
 
 padding:16px;
 
+
 color:white;
 
+
 font-size:14px;
+
 
 text-align:left;
 
@@ -262,12 +535,15 @@ text-align:left;
 
 
 
+
 tbody td{
 
 
 padding:15px;
 
+
 border-bottom:1px solid #eee;
+
 
 font-size:14px;
 
@@ -302,25 +578,9 @@ background:#faf7ed;
 
 
 
-/* =====================
-   ROLE BADGE
-===================== */
-
-
-td:nth-child(5){
-
-
-font-weight:600;
-
-
-}
-
-
-
-
-/* =====================
-   DELETE BUTTON
-===================== */
+/* ==========================
+DELETE BUTTON
+========================== */
 
 
 .delete-btn{
@@ -328,16 +588,17 @@ font-weight:600;
 
 background:#111;
 
+
 color:white;
+
+
+border:none;
 
 
 padding:9px 18px;
 
 
 border-radius:10px;
-
-
-border:none;
 
 
 cursor:pointer;
@@ -350,10 +611,12 @@ font-weight:600;
 
 
 
+
 .delete-btn:hover{
 
 
 background:#d4af37;
+
 
 color:#111;
 
@@ -367,9 +630,168 @@ color:#111;
 
 
 
-/* =====================
-   RESPONSIVE
-===================== */
+/* ==========================
+DELETE MODAL
+========================== */
+
+
+.delete-modal-overlay{
+
+
+position:fixed;
+
+
+top:0;
+
+
+left:0;
+
+
+width:100%;
+
+
+height:100%;
+
+
+background:rgba(0,0,0,.65);
+
+
+display:none;
+
+
+align-items:center;
+
+
+justify-content:center;
+
+
+z-index:999;
+
+
+}
+
+
+
+
+.delete-modal{
+
+
+background:white;
+
+
+width:380px;
+
+
+padding:30px;
+
+
+border-radius:22px;
+
+
+text-align:center;
+
+
+box-shadow:0 20px 50px rgba(0,0,0,.3);
+
+
+}
+
+
+
+.delete-modal h2{
+
+
+margin-bottom:15px;
+
+
+}
+
+
+
+
+
+.delete-modal p{
+
+
+color:#555;
+
+
+margin-bottom:25px;
+
+
+}
+
+
+
+
+
+
+.delete-actions{
+
+
+display:flex;
+
+
+justify-content:center;
+
+
+gap:15px;
+
+
+}
+
+
+
+.btn-danger{
+
+
+background:#dc2626;
+
+
+color:white;
+
+
+}
+
+
+
+.btn-danger:hover{
+
+
+background:#991b1b;
+
+
+}
+
+
+
+
+
+
+
+
+/* ==========================
+RESPONSIVE
+========================== */
+
+
+@media(max-width:900px){
+
+
+.user-form-container{
+
+
+grid-template-columns:1fr;
+
+
+}
+
+
+
+}
+
+
+
 
 
 @media(max-width:700px){
@@ -386,17 +808,6 @@ padding:20px;
 
 
 
-#addEmployeeBtn{
-
-
-width:100%;
-
-
-}
-
-
-
-
 .table-card{
 
 
@@ -410,10 +821,11 @@ padding:20px;
 table{
 
 
-min-width:700px;
+min-width:800px;
 
 
 }
+
 
 
 }
