@@ -2,400 +2,152 @@
 <html lang="en">
 
 <head>
-<link rel="stylesheet" href="css/variables.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/admin-profile.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin-profile.css">
 
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Modern Teams - Admin Profile</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Teams - Admin Profile</title>
 </head>
-
 
 <body>
 
+    <div class="app-layout">
+
+        <!-- SIDEBAR -->
+        <button id="menuToggle" class="menu-toggle">☰</button>
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="assets/logo/mt-logo.jpeg" alt="Logo">
+                <h2>Modern Teams</h2>
+            </div>
+
+            <nav class="menu">
+                <a href="admin.html">🏠 Dashboard</a>
+                <a href="admin-employees.html">👥 Employees</a>
+                <a href="admin-attendance.html">🕒 Attendance</a>
+                <a href="admin-leaves.html">📄 Leaves</a>
+                <a href="admin-announcements.html">📢 Announcements</a>
+                <a class="active" href="admin-profile.html">⚙ Profile</a>
+                <a href="login.html" onclick="logout()">🚪 Logout</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- HEADER -->
+            <header class="topbar">
+                <div>
+                    <h1>Admin Profile</h1>
+                    <p>Manage your account information</p>
+                </div>
+
+                <div class="employee-info">
+                    <div class="notification">🔔</div>
+                    <div class="avatar">MT</div>
+                </div>
+            </header>
+
+            <section class="profile-section">
+
+                <!-- PROFILE BANNER HERO -->
+                <div class="profile-banner">
+                    <div class="profile-photo-box">
+                        <img id="adminPhoto" src="assets/images/default-user.png" alt="Admin Photo">
+                        <label class="change-photo">
+                            Change Photo
+                            <input type="file" id="profilePhoto" accept="image/*">
+                        </label>
+                    </div>
+
+                    <div class="profile-basic">
+                        <h2 id="adminNameDisplay">Admin Name</h2>
+                        <p id="adminDesignationDisplay">HR Administrator</p>
+                        <p id="adminDepartmentDisplay">Administration Department</p>
+                        <span class="status-badge">🟢 Active Admin</span>
+                    </div>
+                </div>
+
+                <!-- PROFILE UPDATE + COMPANY DETAILS GRID -->
+                <div class="profile-grid">
+
+                    <!-- UPDATE PROFILE CARD -->
+                    <div class="profile-card">
+                        <h2>Update Profile</h2>
+
+                        <label>Full Name</label>
+                        <input type="text" id="name" placeholder="Enter Name">
+
+                        <label>Email</label>
+                        <input type="email" id="email" readonly>
+
+                        <label>Phone Number</label>
+                        <input type="text" id="phone" placeholder="Phone Number">
+
+                        <label>Department</label>
+                        <input type="text" id="department" placeholder="Department">
+
+                        <button id="updateProfileBtn">Update Profile</button>
+                        <p id="profileMessage"></p>
+                    </div>
+
+                    <!-- COMPANY DETAILS CARD -->
+                    <div class="company-card">
+                        <h2>System Overview</h2>
+
+                        <div class="company-info">
+                            <div>
+                                <p>Role</p>
+                                <span id="adminRole">Administrator</span>
+                            </div>
+                            <div>
+                                <p>Access Level</p>
+                                <span>Full Admin Access</span>
+                            </div>
+                            <div>
+                                <p>Status</p>
+                                <span>Active</span>
+                            </div>
+                            <div>
+                                <p>Department</p>
+                                <span id="companyDept">Admin</span>
+                            </div>
+                        </div>
+                    </div>
 
-<div class="app-layout">
+                </div>
 
+                <!-- SECURITY CARD -->
+                <div class="security-card">
+                    <h2>🔐 Security</h2>
 
+                    <label>Current Password</label>
+                    <input type="password" id="oldPassword" placeholder="Current Password">
 
-<!-- ======================
-     SIDEBAR
-====================== -->
-<button id="menuToggle" class="menu-toggle">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="New Password">
 
-☰
+                    <button id="changePasswordBtn">Change Password</button>
+                </div>
 
-</button>
+            </section>
 
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
+        </main>
 
+    </div>
 
-<aside class="sidebar">
-
-
-<div class="logo">
-
-
-<img src="assets/logo/mt-logo.jpeg" alt="Logo">
-
-
-<h2>
-Modern Teams
-</h2>
-
-
-</div>
-
-
-
-
-<nav class="menu">
-
-
-<a href="admin.html">
-🏠 Dashboard
-</a>
-
-
-<a href="admin-employees.html">
-👥 Employees
-</a>
-
-
-<a href="admin-attendance.html">
-🕒 Attendance
-</a>
-
-
-<a href="admin-leaves.html">
-📄 Leaves
-</a>
-
-
-<a href="admin-announcements.html">
-📢 Announcements
-</a>
-
-
-<a class="active" href="admin-profile.html">
-⚙ Profile
-</a>
-
-
-
-<a href="login.html" onclick="logout()">
-🚪 Logout
-</a>
-
-
-
-</nav>
-
-
-</aside>
-
-
-
-
-
-
-
-
-
-<!-- ======================
-     MAIN CONTENT
-====================== -->
-
-
-<main class="main-content">
-
-
-
-<!-- HEADER -->
-
-
-<header class="topbar">
-
-<div>
-
-
-<h1>
-Admin Profile
-</h1>
-
-
-<p>
-Manage your account information
-</p>
-
-
-</div>
-
-
-
-<div class="admin-info">
-
-
-<div class="notification">
-🔔
-</div>
-
-
-<div class="avatar">
-MT
-</div>
-
-
-</div>
-
-
-
-</header>
-
-
-
-
-
-
-
-
-
-<section class="content profile-section">
-
-
-
-
-
-
-<!-- PROFILE CARD -->
-
-
-<div class="card profile-card">
-
-
-
-<div class="profile-image">
-
-
-<img 
-id="profileImage"
-src="assets/images/default-user.png"
-alt="Admin Photo">
-
-
-</div>
-
-
-
-
-
-<h2 id="adminName">
-Admin Name
-</h2>
-
-
-
-<p id="adminRole">
-Administrator
-</p>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- UPDATE FORM -->
-
-
-<div class="card profile-form">
-
-
-
-<h2>
-Update Profile
-</h2>
-
-
-
-
-<label>
-Full Name
-</label>
-
-
-<input 
-type="text"
-id="name"
-placeholder="Enter your name">
-
-
-
-
-
-
-
-<label>
-Email
-</label>
-
-
-<input 
-type="email"
-id="email"
-placeholder="Email Address"
-readonly>
-
-
-
-
-
-
-
-
-<label>
-Phone Number
-</label>
-
-
-<input 
-type="text"
-id="phone"
-placeholder="Phone Number">
-
-
-
-
-
-
-
-<label>
-Department
-</label>
-
-
-<input 
-type="text"
-id="department"
-placeholder="Department">
-
-
-
-
-
-
-
-<button id="updateProfileBtn">
-
-Update Profile
-
-</button>
-
-
-
-
-
-<p id="profileMessage"></p>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- PASSWORD SECTION -->
-
-
-<div class="card password-card">
-
-
-
-<h2>
-Change Password
-</h2>
-
-
-
-<input 
-type="password"
-id="oldPassword"
-placeholder="Current Password">
-
-
-
-<input 
-type="password"
-id="newPassword"
-placeholder="New Password">
-
-
-
-
-
-<button id="changePasswordBtn">
-
-Change Password
-
-</button>
-
-
-
-</div>
-
-
-
-
-
-
-</section>
-
-
-
-
-
-
-</main>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="js/supabase.js"></script>
-
-<script src="js/auth.js"></script>
-
-<script src="js/admin-profile.js"></script>
-     <script src="js/sidebar.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin-profile.js"></script>
+    <script src="js/sidebar.js"></script>
 
 </body>
-
 
 </html>
