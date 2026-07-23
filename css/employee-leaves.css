@@ -1,0 +1,295 @@
+/* =========================================
+   MODERN TEAMS HRMS
+   EMPLOYEE LEAVES
+========================================= */
+
+.leave-section{
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+}
+
+/* =========================================
+   APPLY LEAVE CARD
+========================================= */
+
+.form-card{
+    background:#fff;
+    border-radius:22px;
+    padding:30px;
+    border-top:5px solid var(--gold);
+    box-shadow:var(--shadow-sm);
+}
+
+.form-card h2{
+    margin-bottom:25px;
+    color:#111;
+    font-size:24px;
+}
+
+.form-card label{
+    display:block;
+    margin-top:18px;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#555;
+}
+
+.form-card input,
+.form-card select,
+.form-card textarea{
+
+    width:100%;
+    padding:14px 16px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    font-size:15px;
+    outline:none;
+    transition:.25s;
+    background:#fafafa;
+    box-sizing:border-box;
+
+}
+
+.form-card input:focus,
+.form-card select:focus,
+.form-card textarea:focus{
+
+    border-color:var(--gold);
+    background:#fff;
+    box-shadow:0 0 0 3px rgba(212,175,55,.15);
+
+}
+
+.form-card textarea{
+
+    resize:none;
+    min-height:120px;
+
+}
+
+#applyLeaveBtn{
+
+    margin-top:25px;
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#111,#333);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.3s;
+
+}
+
+#applyLeaveBtn:hover{
+
+    background:linear-gradient(135deg,var(--gold),#b8860b);
+    color:#111;
+    transform:translateY(-2px);
+
+}
+
+#leaveMessage{
+
+    margin-top:18px;
+    text-align:center;
+    font-weight:600;
+
+}
+
+/* =========================================
+   HISTORY CARD
+========================================= */
+
+.table-section{
+
+    background:#fff;
+    border-radius:22px;
+    box-shadow:var(--shadow-sm);
+    overflow:hidden;
+
+}
+
+.table-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:22px 28px;
+    border-bottom:1px solid #eee;
+
+}
+
+.table-header h2{
+
+    font-size:24px;
+    color:#111;
+
+}
+
+#leaveHistoryFilter{
+
+    width:180px;
+    padding:10px 14px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    outline:none;
+    cursor:pointer;
+
+}
+
+/* =========================================
+   TABLE
+========================================= */
+
+.table-section table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+.table-section thead{
+
+    background:#111;
+    color:#fff;
+
+}
+
+.table-section th{
+
+    padding:16px;
+    text-align:left;
+    font-size:14px;
+    font-weight:600;
+
+}
+
+.table-section td{
+
+    padding:18px 16px;
+    border-bottom:1px solid #f0f0f0;
+    font-size:14px;
+    color:#444;
+
+}
+
+.table-section tbody tr{
+
+    transition:.25s;
+
+}
+
+.table-section tbody tr:hover{
+
+    background:#fafafa;
+
+}
+
+/* =========================================
+   STATUS BADGES
+========================================= */
+
+.status{
+
+    padding:6px 14px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:700;
+    display:inline-block;
+
+}
+
+.status.pending{
+
+    background:#fff4d6;
+    color:#c18b00;
+
+}
+
+.status.approved{
+
+    background:#dff8e5;
+    color:#14833b;
+
+}
+
+.status.rejected{
+
+    background:#ffe2e2;
+    color:#d62828;
+
+}
+
+/* =========================================
+   EMPTY ROW
+========================================= */
+
+tbody td[colspan]{
+
+    text-align:center;
+    padding:40px;
+    color:#999;
+    font-style:italic;
+
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media(max-width:900px){
+
+.table-header{
+
+    flex-direction:column;
+    align-items:flex-start;
+    gap:15px;
+
+}
+
+#leaveHistoryFilter{
+
+    width:100%;
+
+}
+
+.table-section{
+
+    overflow-x:auto;
+
+}
+
+table{
+
+    min-width:800px;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.form-card{
+
+    padding:22px;
+
+}
+
+.form-card h2,
+.table-header h2{
+
+    font-size:20px;
+
+}
+
+#applyLeaveBtn{
+
+    padding:14px;
+
+}
+
+}
