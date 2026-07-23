@@ -2,592 +2,198 @@
 <html lang="en">
 
 <head>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/employee-dashboard.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
 
-<link rel="stylesheet" href="css/variables.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/components.css">
-
-<link rel="stylesheet" href="css/admin-dashboard.css">
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Modern Teams - Admin Dashboard</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Teams - Admin Dashboard</title>
 </head>
-
 
 <body>
 
-
-<div class="app-layout">
-
-
-
-<!-- SIDEBAR SAME -->
-
-
-<button id="menuToggle" class="menu-toggle">
-☰
-</button>
-
-
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-
-<aside class="sidebar">
-
-
-<div class="logo">
-
-<img src="assets/logo/mt-logo.jpeg">
-
-<h2>
-Modern Teams
-</h2>
-
-</div>
-
-
-
-<nav class="menu">
-
-
-<a class="active" href="admin.html">
-🏠 Dashboard
-</a>
-
-
-<a href="admin-employees.html">
-👥 Employees
-</a>
-
-
-<a href="admin-attendance.html">
-🕒 Attendance
-</a>
-
-
-<a href="admin-leaves.html">
-📄 Leaves
-</a>
-
-
-<a href="admin-announcements.html">
-📢 Announcements
-</a>
-
-
-<a href="admin-profile.html">
-⚙ Profile
-</a>
-
-
-<a href="login.html" onclick="logout()">
-🚪 Logout
-</a>
-
-
-</nav>
-
-
-</aside>
-
-
-
-
-
-
-<main class="main-content">
-
-
-
-
-
-<header class="topbar">
-
-
-<div>
-
-<h1>
-Admin Dashboard
-</h1>
-
-
-<p>
-Modern Teams HRMS
-</p>
-
-
-</div>
-
-
-
-<div class="admin-info">
-
-
-<div class="notification-wrapper">
-
-
-<div class="notification" onclick="openNotifications()">
-
-🔔
-
-<span id="notificationCount" class="notification-badge">
-0
-</span>
-
-</div>
-
-
-</div>
-
-
-
-<div class="avatar">
-MT
-</div>
-
-
-</div>
-
-
-</header>
-
-
-
-
-
-
-
-
-<section class="content admin-dashboard">
-
-
-
-
-
-<!-- WELCOME -->
-
-<div class="admin-welcome">
-
-
-<h2 id="greetingText">
-Good Morning, Admin 👋
-</h2>
-
-
-<p>
-Manage employees, attendance and company operations
-</p>
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- STATS -->
-
-<div class="stats-container">
-
-
-
-<div class="card stats-card employees-card">
-
-<h3>
-👥 Total Employees
-</h3>
-
-<h1 id="totalEmployees">
-0
-</h1>
-
-</div>
-
-
-
-
-<div class="card stats-card present-card">
-
-<h3>
-🟢 Present Today
-</h3>
-
-<h1 id="presentToday">
-0
-</h1>
-
-</div>
-
-
-
-
-
-<div class="card stats-card leave-card">
-
-
-<h3>
-📄 Pending Leaves
-</h3>
-
-
-<h1 id="pendingLeaves">
-0
-</h1>
-
-
-</div>
-
-
-
-
-
-<div class="card stats-card department-card">
-
-
-<h3>
-🏢 Departments
-</h3>
-
-
-<h1 id="totalDepartments">
-0
-</h1>
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- GRAPH + ACTIVITY -->
-
-
-<div class="dashboard-section">
-
-
-
-
-
-<div class="card chart-box">
-
-
-<div class="section-header">
-
-<h2>
-Attendance Analytics
-</h2>
-
-<span>
-Last 7 Days
-</span>
-
-</div>
-
-
-<canvas id="attendanceChart"></canvas>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="card activity-box">
-
-
-<h2>
-Recent Activity
-</h2>
-
-
-
-<div id="recentActivity">
-
-
-<div class="activity-item">
-👤 New employee activity
-</div>
-
-
-<div class="activity-item">
-🕒 Attendance update
-</div>
-
-
-<div class="activity-item">
-📢 Announcement created
-</div>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- DEPARTMENT + INSIGHTS -->
-
-
-<div class="dashboard-section secondary-section">
-
-
-
-
-
-<div class="card department-box">
-
-
-<h2>
-Department Overview
-</h2>
-
-
-<div class="department-list">
-
-
-<div>
-<span>IT</span>
-<div class="progress">
-<div class="progress-fill" style="width:80%"></div>
-</div>
-</div>
-
-
-
-<div>
-<span>HR</span>
-<div class="progress">
-<div class="progress-fill" style="width:40%"></div>
-</div>
-</div>
-
-
-
-<div>
-<span>Sales</span>
-<div class="progress">
-<div class="progress-fill" style="width:65%"></div>
-</div>
-</div>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="card insight-box">
-
-
-<h2>
-Attendance Insights
-</h2>
-
-
-
-<div class="insight-grid">
-
-
-<div>
-<h3>
-Leaves Used
-</h3>
-<p>
-45
-</p>
-</div>
-
-
-
-<div>
-<h3>
-Late Check-ins
-</h3>
-<p>
-8
-</p>
-</div>
-
-
-
-<div>
-<h3>
-Avg Hours
-</h3>
-<p>
-7.8h
-</p>
-</div>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- QUICK ACTIONS -->
-
-
-<div class="card quick-box">
-
-
-<h2>
-Quick Actions
-</h2>
-
-
-
-<div class="quick-buttons">
-
-
-
-<button onclick="location.href='admin-employees.html'"
-class="btn btn-primary">
-
-+ Add Employee
-
-</button>
-
-
-
-<button onclick="location.href='admin-announcements.html'"
-class="btn btn-primary">
-
-📢 Announcement
-
-</button>
-
-
-
-
-<button onclick="location.href='admin-leaves.html'"
-class="btn btn-primary">
-
-Approve Leaves
-
-</button>
-
-
-
-
-
-<button onclick="location.href='admin-attendance.html'"
-class="btn btn-primary">
-
-Attendance Report
-
-</button>
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-</section>
-
-
-</main>
-
-
-
-</div>
-
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script src="js/supabase.js"></script>
-
-<script src="js/auth.js"></script>
-
-<script src="js/admin-dashboard.js"></script>
-
-<script src="js/sidebar.js"></script>
-
-<script src="js/notification.js"></script>
-
-
-<script>
-
-adminGuard();
-
-</script>
-
-
+    <div class="app-layout">
+
+        <button id="menuToggle" class="menu-toggle">☰</button>
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="assets/logo/mt-logo.jpeg" alt="Logo">
+                <h2>Modern Teams</h2>
+            </div>
+
+            <nav class="menu">
+                <a class="active" href="admin.html">🏠 Dashboard</a>
+                <a href="admin-employees.html">👥 Employees</a>
+                <a href="admin-attendance.html">🕒 Attendance</a>
+                <a href="admin-leaves.html">📄 Leaves</a>
+                <a href="admin-announcements.html">📢 Announcements</a>
+                <a href="admin-profile.html">⚙ Profile</a>
+                <a href="login.html" onclick="logout()">🚪 Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+
+            <!-- TOP HEADER -->
+            <header class="topbar">
+                <div class="employee-heading">
+                    <h1 id="greetingText">Good Morning, Admin 👋</h1>
+                    <p>Modern Teams HRMS</p>
+                </div>
+
+                <div class="employee-info">
+                    <div class="notification-wrapper" onclick="openNotifications()">
+                        <div class="notification">
+                            🔔
+                            <span id="notificationCount" class="notification-badge">0</span>
+                        </div>
+                    </div>
+                    <div class="avatar">MT</div>
+                </div>
+            </header>
+
+            <section class="content dashboard">
+
+                <!-- ADMIN PROFILE HERO -->
+                <div class="profile-hero">
+                    <div class="profile-image">
+                        <img src="assets/images/default-user.png" id="adminPhoto" alt="Admin">
+                    </div>
+                    <div class="profile-details">
+                        <h2 id="adminName">Admin Name</h2>
+                        <p id="adminDesignation">HR Administrator</p>
+                        <p id="adminDepartment">Administration Department</p>
+                        <span class="status-badge">🟢 Active Admin</span>
+                    </div>
+                </div>
+
+                <!-- STATS -->
+                <div class="stats-container">
+                    <div class="card stat-box">
+                        <h3>👥 Total Employees</h3>
+                        <h1 id="totalEmployees">0</h1>
+                    </div>
+                    <div class="card stat-box">
+                        <h3>🟢 Present Today</h3>
+                        <h1 id="presentToday">0</h1>
+                    </div>
+                    <div class="card stat-box">
+                        <h3>🔴 Absent Today</h3>
+                        <h1 id="absentToday">0</h1>
+                    </div>
+                    <div class="card stat-box">
+                        <h3>📄 Pending Leaves</h3>
+                        <h1 id="pendingLeaves">0</h1>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS GRID -->
+                <div class="dashboard-grid">
+                    <div class="card section-card chart-box">
+                        <div class="section-header">
+                            <h2>Attendance Analytics</h2>
+                            <span>Last 7 Days</span>
+                        </div>
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+
+                    <div class="card section-card">
+                        <h2>Recent Activity</h2>
+                        <div id="recentActivity">
+                            <div class="activity-item">👤 New employee activity</div>
+                            <div class="activity-item">🕒 Attendance update</div>
+                            <div class="activity-item">📢 Announcement created</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEPARTMENT + LIVE ATTENDANCE GRID -->
+                <div class="dashboard-grid">
+                    <div class="card section-card">
+                        <h2>Department Overview</h2>
+                        <div class="department-list">
+                            <div>
+                                <span>IT</span>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width:80%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <span>HR</span>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width:40%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <span>Sales</span>
+                                <div class="progress">
+                                    <div class="progress-fill" style="width:65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LIVE ATTENDANCE MONITOR -->
+                    <div class="card section-card live-attendance-box">
+                        <div class="section-header">
+                            <h2>🟢 Live Attendance Monitor</h2>
+                            <span>Live Status</span>
+                        </div>
+                        <div class="live-table-container">
+                            <table class="live-attendance-table">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Check In</th>
+                                        <th>Check Out</th>
+                                        <th>Break</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="liveAttendanceTable">
+                                    <tr>
+                                        <td colspan="5">Loading attendance...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK ACTION -->
+                <div class="card section-card quick-box">
+                    <h2>Quick Actions</h2>
+                    <div class="quick-buttons">
+                        <button class="btn" onclick="location.href='admin-employees.html'">+ Add Employee</button>
+                        <button class="btn" onclick="location.href='admin-announcements.html'">📢 Announcement</button>
+                        <button class="btn" onclick="location.href='admin-leaves.html'">Approve Leaves</button>
+                        <button class="btn" onclick="location.href='admin-attendance.html'">Attendance Report</button>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/notification.js"></script>
+
+    <script>
+        adminGuard();
+    </script>
 </body>
 
 </html>
