@@ -397,3 +397,32 @@ min-width:700px;
 
 
 }
+
+
+.table-section{
+
+    overflow-x:auto;
+    width:100%;
+
+}
+
+
+.table-section table{
+
+    width:100%;
+    min-width:900px;
+    border-collapse:collapse;
+
+}
+
+@media(max-width:700px){
+
+.table-section{
+    overflow-x:auto;
+}
+
+.table-section table{
+    min-width:900px;
+}
+
+}
