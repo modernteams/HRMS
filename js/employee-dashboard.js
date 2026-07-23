@@ -216,9 +216,15 @@ if(data.check_in){
 
 document.getElementById("checkInTime")
 .innerText =
-new Date(data.check_in)
-.toLocaleTimeString();
-
+new Date(data.check_in).toLocaleTimeString(
+"en-IN",
+{
+timeZone:"Asia/Kolkata",
+hour:"2-digit",
+minute:"2-digit",
+hour12:true
+}
+);
 }
 
 
@@ -227,9 +233,15 @@ if(data.check_out){
 
 document.getElementById("checkOutTime")
 .innerText =
-new Date(data.check_out)
-.toLocaleTimeString();
-
+new Date(data.check_out).toLocaleTimeString(
+"en-IN",
+{
+timeZone:"Asia/Kolkata",
+hour:"2-digit",
+minute:"2-digit",
+hour12:true
+}
+);
 }
 
 
@@ -459,7 +471,23 @@ if (data.check_out) {
     alert("You have already checked out today.");
     return;
 }
+const totalBreakMinutes =
+await getTotalBreakMinutes();
 
+
+const totalMinutes =
+calculateHours(
+data.check_in,
+now
+);
+
+
+const finalMinutes =
+totalMinutes - totalBreakMinutes;
+
+
+const finalHours =
+finalMinutes / 60;
 
 const {error}=await supabaseClient
 .from("attendance")
@@ -471,10 +499,11 @@ now,
 
 
 working_hours:
-calculateHours(
-data.check_in,
-now
-)
+Number(finalHours.toFixed(2)),
+
+
+total_break_minutes:
+totalBreakMinutes
 
 
 })
@@ -482,8 +511,6 @@ now
 "id",
 data.id
 );
-
-
 
 
 if(error){
@@ -782,34 +809,27 @@ return R*c;
 function calculateHours(start,end){
 
 
-if(!start || !end)
-
-return 0;
-
-
-
 const startTime =
 Date.parse(start);
-
 
 
 const endTime =
 Date.parse(end);
 
 
-
 const difference =
-endTime - startTime;
+endTime-startTime;
 
 
+// minutes
 
-const hours =
-difference / (1000 * 60 * 60);
+const minutes =
+Math.floor(
+difference/(1000*60)
+);
 
 
-
-return Number(hours.toFixed(2));
-
+return minutes;
 
 }
 function formatWorkingHours(hours){
@@ -822,6 +842,56 @@ function formatWorkingHours(hours){
     const m = totalMinutes % 60;
 
     return `${h}h ${m}m`;
+}
+async function getTotalBreakMinutes(){
+
+const today =
+new Date().toLocaleDateString(
+"en-CA",
+{
+timeZone:"Asia/Kolkata"
+}
+);
+
+
+const {data,error}=await supabaseClient
+.from("employee_breaks")
+.select("duration_minutes")
+.eq(
+"employee_id",
+currentEmployee.id
+)
+.gte(
+"start_time",
+today+" 00:00:00"
+)
+.lte(
+"start_time",
+today+" 23:59:59"
+);
+
+
+
+if(error){
+console.log(error);
+return 0;
+}
+
+
+
+let total=0;
+
+
+data.forEach(item=>{
+
+total += item.duration_minutes || 0;
+
+});
+
+
+return total;
+
+
 }
 
 async function loadAnnouncements(){
@@ -889,7 +959,290 @@ function autoRefreshAtMidnight(){
 }
 
 autoRefreshAtMidnight();
+// =====================================
+// BREAK MANAGEMENT
+// =====================================
 
 
+let breakTimerInterval = null;
+let breakStartTime = null;
+
+
+// START BREAK
+
+async function startBreak(type){
+
+
+if(!currentEmployee){
+
+alert("Employee not found");
+return;
+
+}
+
+
+// check running break
+
+const {data:active}=await supabaseClient
+.from("employee_breaks")
+.select("*")
+.eq("employee_id",currentEmployee.id)
+.is("end_time",null)
+.maybeSingle();
+
+
+
+if(active){
+
+alert("Already break running");
+
+return;
+
+}
+
+const startTime = new Date(
+new Date().toLocaleString(
+"en-US",
+{
+timeZone:"Asia/Kolkata"
+}
+)
+);
+
+const {error}=await supabaseClient
+.from("employee_breaks")
+.insert({
+
+employee_id:currentEmployee.id,
+
+break_type:type,
+
+start_time:startTime
+
+});
+
+
+
+if(error){
+
+alert(error.message);
+return;
+
+}
+
+
+// important for timer
+
+breakStartTime = startTime;
+
+
+
+document.getElementById("breakStatus").innerText =
+type+" Break Started";
+
+
+
+startBreakTimer();
+
+
+
+}
+
+
+
+// END BREAK
+
+
+async function endBreak(){
+
+
+const {data:active,error}=await supabaseClient
+.from("employee_breaks")
+.select("*")
+.eq("employee_id",currentEmployee.id)
+.is("end_time",null)
+.single();
+
+
+
+if(error || !active){
+
+alert("No active break");
+
+return;
+
+}
+
+const endTime = new Date(
+new Date().toLocaleString(
+"en-US",
+{
+timeZone:"Asia/Kolkata"
+}
+)
+);
+
+const startTime = new Date(
+new Date(active.start_time).toLocaleString(
+"en-US",
+{
+timeZone:"Asia/Kolkata"
+}
+)
+);
+
+const diffMilliseconds =
+endTime - startTime;
+
+
+const minutes = Math.floor(
+    diffMilliseconds / 60000
+);
+
+const {error:updateError}=await supabaseClient
+.from("employee_breaks")
+.update({
+
+end_time:endTime,
+
+duration_minutes:minutes
+
+})
+.eq(
+"id",
+active.id
+);
+
+
+if(updateError){
+
+alert(updateError.message);
+
+return;
+
+}
+clearInterval(breakTimerInterval);
+
+
+
+document.getElementById("breakTimer").innerText=
+"00:00:00";
+
+
+document.getElementById("breakStatus").innerText=
+active.break_type+
+" Break Ended ("+
+minutes+
+" min)";
+
+
+breakStartTime=null;
+
+
+}
+
+
+
+
+// TIMER
+
+
+function startBreakTimer(){
+
+
+clearInterval(breakTimerInterval);
+
+
+
+breakTimerInterval=setInterval(()=>{
+
+
+if(!breakStartTime)
+return;
+
+
+
+const diff =
+new Date()-breakStartTime;
+
+
+
+let h=Math.floor(
+diff/(1000*60*60)
+);
+
+
+
+let m=Math.floor(
+(diff/(1000*60))%60
+);
+
+
+
+let s=Math.floor(
+(diff/1000)%60
+);
+
+
+
+document.getElementById("breakTimer").innerText =
+
+String(h).padStart(2,"0")
++
+":"
++
+String(m).padStart(2,"0")
++
+":"
++
+String(s).padStart(2,"0");
+
+
+
+},1000);
+
+
+
+}
+
+
+
+
+// BUTTONS
+
+
+document
+.getElementById("lunchBreakBtn")
+.addEventListener(
+"click",
+()=>startBreak("Lunch")
+);
+
+
+
+document
+.getElementById("teaBreakBtn")
+.addEventListener(
+"click",
+()=>startBreak("Tea")
+);
+
+
+
+document
+.getElementById("otherBreakBtn")
+.addEventListener(
+"click",
+()=>startBreak("Other")
+);
+
+
+
+document
+.getElementById("endBreakBtn")
+.addEventListener(
+"click",
+()=>endBreak()
+);
 
 loadEmployeeDashboard();
