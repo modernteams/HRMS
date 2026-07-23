@@ -1,7 +1,11 @@
 // ======================================
 // MODERN TEAMS HRMS
-// ADMIN DASHBOARD
+// ADMIN DASHBOARD JS
 // ======================================
+
+
+let currentAdmin = null;
+
 
 
 async function loadAdminDashboard(){
@@ -9,64 +13,192 @@ async function loadAdminDashboard(){
 
 console.log("Admin Dashboard Loading...");
 
+
+
 // ===============================
-// DYNAMIC GREETING
+// ADMIN PROFILE + GREETING
 // ===============================
 
-function updateGreeting(){
 
-const greetingElement = 
+const {data:{user}} =
+await supabaseClient.auth.getUser();
+
+
+
+if(user){
+
+
+const {data:profile,error}=
+
+await supabaseClient
+
+.from("profiles")
+
+.select("*")
+
+.eq("id",user.id)
+
+.single();
+
+
+
+if(profile){
+
+
+currentAdmin = profile;
+
+
+
+const name =
+profile.full_name || "Admin";
+
+
+
+updateGreeting(name);
+
+
+
+// ADMIN DETAILS
+
+
+const adminName =
+document.getElementById("adminName");
+
+
+if(adminName)
+adminName.innerText = name;
+
+
+
+
+const designation =
+document.getElementById("adminDesignation");
+
+
+if(designation)
+
+designation.innerText =
+profile.designation || "HR Administrator";
+
+
+
+
+const department =
+document.getElementById("adminDepartment");
+
+
+if(department)
+
+department.innerText =
+profile.department || "Administration";
+
+
+
+
+// ADMIN PROFILE IMAGE
+
+
+if(profile.profile_image){
+
+
+
+const adminPhoto =
+document.getElementById("adminPhoto");
+
+
+
+const adminHeaderPhoto =
+document.getElementById("adminHeaderPhoto");
+
+
+
+if(adminPhoto)
+
+adminPhoto.src =
+profile.profile_image;
+
+
+
+if(adminHeaderPhoto)
+
+adminHeaderPhoto.src =
+profile.profile_image;
+
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+// ===============================
+// GREETING
+// ===============================
+
+
+function updateGreeting(name){
+
+
+const greetingElement =
 document.getElementById("greetingText");
 
 
-if(!greetingElement){
-    return;
-}
+
+if(!greetingElement)
+return;
 
 
-const hour = new Date().getHours();
+
+const hour =
+new Date().getHours();
 
 
-let greeting = "";
+
+let greeting;
 
 
-if(hour >= 5 && hour < 12){
 
-    greeting = "Good Morning";
+if(hour>=5 && hour<12){
 
-}
-
-else if(hour >= 12 && hour < 17){
-
-    greeting = "Good Afternoon";
+greeting="Good Morning";
 
 }
 
-else if(hour >= 17 && hour < 21){
+else if(hour>=12 && hour<17){
 
-    greeting = "Good Evening";
+greeting="Good Afternoon";
+
+}
+
+else if(hour>=17 && hour<21){
+
+greeting="Good Evening";
 
 }
 
 else{
 
-    greeting = "Good Night";
+greeting="Good Night";
 
 }
 
 
 
 greetingElement.innerHTML =
-`${greeting}, Admin 👋`;
-
+`${greeting}, ${name} 👋`;
 
 }
 
 
 
-// Run when page loads
 
-updateGreeting();
 
 // ===============================
 // TOTAL EMPLOYEES
@@ -85,17 +217,25 @@ await supabaseClient
 
 
 
+
 if(employeeError){
 
-console.log("Employee Error:",employeeError);
+console.log(employeeError);
 
 }
+
 else{
 
 
-document.getElementById(
-"totalEmployees"
-).innerText = employees.length;
+const el =
+document.getElementById("totalEmployees");
+
+
+if(el)
+
+el.innerText =
+employees.length;
+
 
 
 }
@@ -112,13 +252,21 @@ const today =
 new Date()
 .toLocaleDateString("en-CA");
 
-const {data:attendance,error:attendanceError}=await supabaseClient
+
+
+const {data:attendance,error:attendanceError}=
+
+await supabaseClient
+
 .from("attendance")
+
 .select("*")
+
 .eq(
 "attendance_date",
 today
 )
+
 .not(
 "check_in",
 "is",
@@ -126,25 +274,68 @@ null
 );
 
 
+
+
+
+let presentCount = 0;
+
+
+
 if(attendanceError){
 
-console.log(
-"Attendance Error:",
-attendanceError
-);
-
+console.log(attendanceError);
 
 }
+
 else{
 
 
-document.getElementById(
-"presentToday"
-).innerText =
+presentCount =
 attendance.length;
 
 
+
+const el =
+document.getElementById("presentToday");
+
+
+if(el)
+
+el.innerText =
+presentCount;
+
+
+
 }
+
+
+
+
+// ===============================
+// ABSENT TODAY
+// ===============================
+
+
+const total =
+employees ? employees.length : 0;
+
+
+
+const absent =
+total - presentCount;
+
+
+
+const absentElement =
+document.getElementById("absentToday");
+
+
+
+if(absentElement)
+
+absentElement.innerText =
+absent < 0 ? 0 : absent;
+
 
 
 
@@ -173,24 +364,26 @@ await supabaseClient
 
 if(leaveError){
 
-console.log(
-"Leave Error:",
-leaveError
-);
-
+console.log(leaveError);
 
 }
+
 else{
 
 
-document.getElementById(
-"pendingLeaves"
-).innerText =
+const el =
+document.getElementById("pendingLeaves");
+
+
+
+if(el)
+
+el.innerText =
 leaves.length;
 
 
-}
 
+}
 
 
 
@@ -212,68 +405,80 @@ await supabaseClient
 
 
 
-if(departmentError){
-
-console.log(
-"Department Error:",
-departmentError
-);
+if(!departmentError){
 
 
-}
-else{
+const el =
+document.getElementById("totalDepartments");
 
 
-document.getElementById(
-"totalDepartments"
-).innerText =
+if(el)
+
+el.innerText =
 departments.length;
 
 
+
+}
+
+
+
 }
 
 
 
 
 
-}
 
-
-
-
+// LOAD DASHBOARD
 
 loadAdminDashboard();
+
+
+
+
+
+
 // =================================
-// 7 DAYS ATTENDANCE LINE CHART
+// ATTENDANCE CHART
 // =================================
+
 
 async function loadAttendanceChart(){
 
 
-const today = new Date();
 
-let labels = [];
-let attendanceData = [];
+let labels=[];
 
-
-
-// Last 7 Days Calculate
-
-for(let i = 6; i >= 0; i--){
+let attendanceData=[];
 
 
-let date = new Date();
+
+const today =
+new Date();
+
+
+
+for(let i=6;i>=0;i--){
+
+
+let date =
+new Date();
+
+
 
 date.setDate(
-today.getDate() - i
+today.getDate()-i
 );
+
 
 
 let dateString =
 date.toLocaleDateString("en-CA");
 
 
-let dayName =
+
+let day =
 date.toLocaleDateString(
 "en-IN",
 {
@@ -283,19 +488,23 @@ weekday:"short"
 
 
 
-labels.push(dayName);
+labels.push(day);
 
 
 
+const {data,error}=
 
-// Attendance Count
-const {data,error}=await supabaseClient
+await supabaseClient
+
 .from("attendance")
+
 .select("*")
+
 .eq(
 "attendance_date",
 dateString
 )
+
 .not(
 "check_in",
 "is",
@@ -303,43 +512,39 @@ null
 );
 
 
-if(error){
 
-console.log(error);
+if(error)
 
 attendanceData.push(0);
 
-}
-else{
+
+else
 
 attendanceData.push(
 data.length
 );
 
 
-}
-
 
 }
 
 
 
 
-
-
-const ctx =
+const canvas =
 document.getElementById(
 "attendanceChart"
 );
 
 
 
-if(!ctx)
+if(!canvas)
 return;
 
 
 
-new Chart(ctx,{
+new Chart(canvas,{
+
 
 type:"line",
 
@@ -347,38 +552,27 @@ type:"line",
 data:{
 
 
-labels:labels,
+labels,
 
 
 datasets:[{
 
-
 label:"Present Employees",
-
 
 data:attendanceData,
 
-
 borderWidth:3,
 
-
-tension:0.4,
-
+tension:.4,
 
 fill:true,
 
-
-pointRadius:5,
-
-
-pointHoverRadius:8
-
-
+pointRadius:5
 
 }]
 
-},
 
+},
 
 
 
@@ -387,54 +581,7 @@ options:{
 
 responsive:true,
 
-
-maintainAspectRatio:false,
-
-
-
-plugins:{
-
-
-legend:{
-
-
-display:true,
-
-
-position:"top"
-
-
-}
-
-
-},
-
-
-
-scales:{
-
-
-y:{
-
-
-beginAtZero:true,
-
-
-ticks:{
-
-
-stepSize:10
-
-
-}
-
-
-
-}
-
-
-
-}
+maintainAspectRatio:false
 
 
 
@@ -450,27 +597,256 @@ stepSize:10
 
 
 
+
 loadAttendanceChart();
+
+
+
+
+
+
+
+// =================================
+// LIVE ATTENDANCE
+// =================================
+
+
+async function loadLiveAttendance(){
+
+
+
+const today =
+new Date()
+.toLocaleDateString("en-CA");
+
+
+
+const {data,error}=
+
+await supabaseClient
+
+.from("attendance")
+
+.select(`
+
+*,
+
+profiles(
+
+full_name
+
+)
+
+`)
+
+.eq(
+"attendance_date",
+today
+);
+
+
+
+
+const table =
+document.getElementById(
+"liveAttendanceTable"
+);
+
+
+
+if(!table)
+return;
+
+
+
+if(error){
+
+console.log(error);
+
+return;
+
+}
+
+
+
+table.innerHTML="";
+
+
+
+
+
+if(!data || data.length===0){
+
+
+table.innerHTML=`
+
+<tr>
+
+<td colspan="5">
+
+No attendance today
+
+</td>
+
+</tr>
+
+`;
+
+
+return;
+
+
+}
+
+
+
+
+data.forEach(item=>{
+
+
+let status =
+item.check_out
+?
+"🔴 Checked Out"
+:
+"🟢 Working";
+
+
+
+let breakStatus =
+item.break_status
+?
+"☕ Break"
+:
+"Active";
+
+
+
+table.innerHTML += `
+
+
+<tr>
+
+
+<td>
+
+${item.profiles?.full_name || "Employee"}
+
+</td>
+
+
+<td>
+
+${item.check_in
+?
+new Date(item.check_in)
+.toLocaleTimeString()
+:
+"--"}
+
+</td>
+
+
+<td>
+
+${item.check_out
+?
+new Date(item.check_out)
+.toLocaleTimeString()
+:
+"Working"}
+
+</td>
+
+
+<td>
+
+${breakStatus}
+
+</td>
+
+
+<td>
+
+${status}
+
+</td>
+
+
+</tr>
+
+
+`;
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+loadLiveAttendance();
+
+
+
+
+
+setInterval(
+loadLiveAttendance,
+30000
+);
+
+
+
+
+
+
+// =================================
+// MIDNIGHT REFRESH
+// =================================
+
 
 function autoRefreshAtMidnight(){
 
-const now = new Date();
 
-const midnight = new Date();
+const now =
+new Date();
 
-midnight.setHours(24,0,0,0);
 
-const timeLeft = midnight - now;
+
+const midnight =
+new Date();
+
+
+
+midnight.setHours(
+24,0,0,0
+);
+
+
+
+const time =
+midnight-now;
+
 
 
 setTimeout(()=>{
 
+
 location.reload();
 
-},timeLeft);
+
+},time);
+
 
 
 }
+
 
 
 autoRefreshAtMidnight();
