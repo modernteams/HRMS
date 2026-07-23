@@ -253,18 +253,6 @@ color:var(--black);
 ========================= */
 
 
-.dashboard-grid{
-
-display:grid;
-
-grid-template-columns:1fr 1fr;
-
-gap:25px;
-
-}
-
-
-
 /* =========================
    ATTENDANCE CARD
 ========================= */
@@ -410,21 +398,47 @@ color:var(--gold);
 /* =========================
    QUICK ACTIONS
 ========================= */
-
-
 .quick-actions{
 
 background:#111;
 
-padding:30px;
+padding:25px;
 
 border-radius:22px;
 
 box-shadow:var(--shadow-lg);
 
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+flex-wrap:wrap;
+
 }
 
 
+
+.quick-actions h2{
+
+width:100%;
+
+color:white;
+
+margin-bottom:10px;
+
+}
+
+
+
+.quick-actions button{
+
+flex:1;
+
+min-width:180px;
+
+}
 
 .quick-actions h2{
 
@@ -433,32 +447,27 @@ color:white;
 }
 
 
-
 .quick-actions button{
 
 width:100%;
 
-margin-bottom:15px;
+margin-bottom:12px;
 
-padding:14px;
+padding:12px;
 
 border-radius:12px;
 
-border:1px solid rgba(255,255,255,.2);
-
 background:white;
 
-color:black;
+color:#111;
 
 font-weight:600;
 
+border:none;
+
 cursor:pointer;
 
-transition:.3s;
-
 }
-
-
 
 .quick-actions button:hover{
 
@@ -592,6 +601,514 @@ flex-direction:column;
 font-size:24px;
 
 }
+}
 
+/* =================================
+   BREAK MANAGEMENT CARD
+================================= */
+.break-card h3{
+
+font-size:20px;
+
+margin-bottom:20px;
+
+color:#111;
+
+}
+
+
+/* BREAK BUTTON AREA */
+
+.break-buttons{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:12px;
+
+}
+
+
+/* ALL BREAK BUTTON */
+
+.break-buttons button{
+
+padding:14px;
+
+border:none;
+
+border-radius:14px;
+
+font-weight:700;
+
+font-size:14px;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+
+/* LUNCH */
+#lunchBreakBtn{
+
+background:#f59e0b;
+color:white;
+
+}
+
+
+#teaBreakBtn{
+
+background:#2563eb;
+color:white;
+
+}
+
+
+#otherBreakBtn{
+
+background:#7c3aed;
+color:white;
+
+}
+
+/* END */
+
+#endBreakBtn{
+
+background:#dc2626;
+
+color:white;
+
+}
+
+
+/* HOVER */
+
+.break-buttons button:hover{
+
+transform:translateY(-3px);
+
+opacity:.9;
+
+}
+
+
+
+/* TIMER BOX */
+
+.break-status{
+
+margin-top:25px;
+
+padding:20px;
+
+background:#111;
+
+border-radius:18px;
+
+text-align:center;
+
+}
+
+
+
+#breakTimer{
+
+font-size:38px;
+
+font-weight:800;
+
+letter-spacing:2px;
+
+color:#d4af37;
+
+margin:0;
+
+}
+
+
+
+#breakType{
+
+margin-top:10px;
+
+font-size:15px;
+
+color:#ffffff;
+
+font-weight:600;
+
+}
+
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+
+.break-buttons{
+
+grid-template-columns:1fr;
+
+}
+
+
+#breakTimer{
+
+font-size:30px;
+
+}
+
+}
+
+/* =================================
+   ATTENDANCE HISTORY TABLE
+================================= */
+
+
+.attendance-history-card{
+
+background:white;
+
+padding:30px;
+
+border-radius:22px;
+
+box-shadow:var(--shadow-sm);
+
+border-left:5px solid var(--gold);
+
+}
+
+
+
+.attendance-history-card h2{
+
+margin-bottom:20px;
+
+color:#111;
+
+}
+
+
+
+.attendance-history-card table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+
+
+.attendance-history-card th{
+
+background:#111;
+
+color:white;
+
+padding:14px;
+
+text-align:left;
+
+font-size:14px;
+
+}
+
+
+
+.attendance-history-card td{
+
+padding:14px;
+
+border-bottom:1px solid #eee;
+
+color:#333;
+
+}
+
+
+
+.attendance-status{
+
+padding:6px 14px;
+
+border-radius:20px;
+
+font-size:12px;
+
+font-weight:700;
+
+}
+
+
+
+.attendance-status.present{
+
+background:#dcfce7;
+
+color:#15803d;
+
+}
+
+
+
+.attendance-status.absent{
+
+background:#fee2e2;
+
+color:#dc2626;
+
+}
+
+/* =================================
+   BREAK MANAGEMENT CARD
+   PREMIUM DESIGN
+================================= */
+
+
+.break-card{
+
+background:white;
+
+padding:30px;
+
+border-radius:22px;
+
+box-shadow:var(--shadow-sm);
+
+border-left:5px solid var(--gold);
+
+}
+
+
+
+.break-card h2{
+
+font-size:22px;
+
+margin-bottom:25px;
+
+color:#111;
+
+}
+
+
+
+/* BREAK BUTTON GRID */
+
+.break-buttons{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:15px;
+
+}
+
+
+
+/* BUTTON COMMON */
+
+.break-buttons button{
+
+padding:14px;
+
+border:none;
+
+border-radius:14px;
+
+font-weight:700;
+
+font-size:14px;
+
+cursor:pointer;
+
+transition:.3s;
+
+color:white;
+
+}
+
+
+
+/* COLORS */
+
+
+#lunchBreakBtn{
+
+background:#f89d00;
+
+}
+
+
+
+#teaBreakBtn{
+
+background:#b97e18;
+
+}
+
+
+
+#otherBreakBtn{
+
+background:#856020;
+
+}
+
+
+
+#endBreakBtn{
+
+background:#dc2626;
+
+}
+
+
+
+
+.break-buttons button:hover{
+
+transform:translateY(-4px);
+
+opacity:.9;
+
+}
+
+
+
+
+/* TIMER BOX */
+
+
+.break-info{
+
+margin-top:20px;
+
+background:#111;
+
+border-radius:18px;
+
+padding:25px;
+
+text-align:center;
+
+}
+
+
+
+#breakTimer{
+
+font-size:40px;
+
+font-weight:800;
+
+letter-spacing:3px;
+
+color:var(--gold);
+
+margin:0;
+
+}
+
+
+
+#breakStatus{
+
+margin-top:10px;
+
+font-size:15px;
+
+color:white;
+
+font-weight:600;
+
+}
+
+
+
+
+
+/* RESPONSIVE */
+
+
+@media(max-width:900px){
+
+
+.break-buttons{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+
+}
+
+
+
+@media(max-width:600px){
+
+
+.break-buttons{
+
+grid-template-columns:1fr;
+
+}
+
+
+#breakTimer{
+
+font-size:32px;
+
+}
+
+
+}
+
+
+.quick-actions button{
+
+flex:1;
+
+width:auto;
+
+margin-bottom:0;
+
+}
+
+
+.quick-actions a{
+
+text-decoration:none;
+
+color:inherit;
+
+}
+
+.dashboard-grid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:20px;
+
+align-items:stretch;
+
+}
+
+.attendance-card,
+.break-card{
+
+min-height:300px;
+
+height:100%;
 
 }
