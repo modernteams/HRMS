@@ -1,366 +1,273 @@
 /* =====================================
    MODERN TEAMS HRMS
-   ADMIN PROFILE CSS
-   Theme: Black White Gold
+   ADMIN PROFILE - CORPORATE GOLD UI
 ===================================== */
 
-
-
-/* =====================
-   PROFILE SECTION
-===================== */
-
-
-.profile-section{
-
-
-display:grid;
-
-
-grid-template-columns:320px 1fr;
-
-
-gap:30px;
-
-
-align-items:start;
-
-
+/* MAIN SECTION */
+.profile-section {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    background: var(--background, #f8f9fa);
 }
 
-
-
-
-
-
-
-/* =====================
-   PROFILE CARD
-===================== */
-
-
-.profile-card{
-
-
-padding:35px;
-
-
-text-align:center;
-
-
+/* =====================================
+   PROFILE BANNER (HERO CARD)
+===================================== */
+.profile-banner {
+    background: linear-gradient(135deg, #111111, #242424);
+    border-radius: 24px;
+    padding: 35px;
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    color: white;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, .25);
+    position: relative;
+    overflow: hidden;
 }
 
-
-
-
-
-.profile-image{
-
-
-width:130px;
-
-
-height:130px;
-
-
-margin:0 auto 20px;
-
-
+.profile-banner::after {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: var(--gold, #d4af37);
+    opacity: .15;
+    border-radius: 50%;
+    right: -80px;
+    top: -80px;
 }
 
-
-
-
-.profile-image img{
-
-
-width:100%;
-
-
-height:100%;
-
-
-border-radius:50%;
-
-
-object-fit:cover;
-
-
-border:4px solid var(--gold);
-
-
+/* PHOTO BOX & UPLOAD BUTTON */
+.profile-photo-box {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
 }
 
-
-
-
-
-.profile-card h2{
-
-
-font-size:24px;
-
-
-margin-bottom:8px;
-
-
+.profile-photo-box img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    background: white;
+    padding: 5px;
+    border: 5px solid var(--gold, #d4af37);
 }
 
-
-
-
-.profile-card p{
-
-
-color:#666;
-
-
-font-weight:600;
-
-
+.change-photo {
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold, #d4af37);
+    color: #111;
+    padding: 8px 15px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: .3s;
 }
 
-
-
-
-
-
-
-
-/* =====================
-   FORM CARD
-===================== */
-
-
-.profile-form{
-
-
-padding:35px;
-
-
+.change-photo:hover {
+    background: white;
+    color: #111;
 }
 
-
-
-
-
-.profile-form h2,
-.password-card h2{
-
-
-font-size:22px;
-
-
-margin-bottom:25px;
-
-
+.change-photo input {
+    display: none;
 }
 
-
-
-
-
-.profile-form label{
-
-
-display:block;
-
-
-font-size:14px;
-
-
-font-weight:600;
-
-
-margin-bottom:8px;
-
-
-color:#444;
-
-
+/* PROFILE TEXT INFO */
+.profile-basic {
+    z-index: 2;
 }
 
-
-
-
-
-.profile-form input,
-.password-card input{
-
-
-width:100%;
-
-
-padding:14px 16px;
-
-
-border-radius:12px;
-
-
-border:1px solid #ddd;
-
-
-font-size:15px;
-
-
-margin-bottom:20px;
-
-
-outline:none;
-
-
+.profile-basic h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: white;
 }
 
-
-
-
-
-
-
-.profile-form input:focus,
-.password-card input:focus{
-
-
-border-color:var(--gold);
-
-
-box-shadow:
-0 0 0 3px rgba(212,175,55,.15);
-
-
+.profile-basic p {
+    font-size: 16px;
+    margin: 6px 0;
+    color: #d1d1d1;
 }
 
-
-
-
-
-
-
-/* =====================
-   BUTTONS
-===================== */
-
-
-.profile-form button,
-.password-card button{
-
-
-background:#111;
-
-
-color:white;
-
-
-border:none;
-
-
-padding:14px 25px;
-
-
-border-radius:12px;
-
-
-font-weight:700;
-
-
-cursor:pointer;
-
-
-transition:.3s;
-
-
+.status-badge {
+    display: inline-block;
+    margin-top: 15px;
+    background: #16a34a;
+    color: white;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
 }
 
-
-
-.profile-form button:hover,
-.password-card button:hover{
-
-
-background:var(--gold);
-
-
-color:#111;
-
-
+/* =====================================
+   TWO COLUMN GRID
+===================================== */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
 }
 
-
-
-
-
-
-
-/* =====================
-   MESSAGE
-===================== */
-
-
-#profileMessage{
-
-
-margin-top:15px;
-
-
-font-weight:600;
-
-
+/* CARDS COMMON DESIGN */
+.profile-card,
+.company-card,
+.security-card {
+    background: white;
+    border-radius: 22px;
+    padding: 30px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, .10);
+    border-top: 5px solid var(--gold, #d4af37);
 }
 
-
-
-
-
-
-
-
-/* =====================
-   PASSWORD CARD
-===================== */
-
-
-.password-card{
-
-
-padding:35px;
-
-
-grid-column:2;
-
-
+.profile-card h2,
+.company-card h2,
+.security-card h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+    color: var(--black, #111);
 }
 
-
-
-
-
-/* =====================
-   RESPONSIVE
-===================== */
-
-
-@media(max-width:900px){
-
-
-
-.profile-section{
-
-
-grid-template-columns:1fr;
-
-
+/* =====================================
+   FORM INPUTS
+===================================== */
+.profile-card label,
+.security-card label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
 }
 
-
-
-.password-card{
-
-
-grid-column:auto;
-
-
+.profile-card input,
+.security-card input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    margin-bottom: 18px;
+    font-size: 15px;
+    background: #fafafa;
+    transition: .3s;
+    box-sizing: border-box;
 }
 
+.profile-card input:focus,
+.security-card input:focus {
+    outline: none;
+    border-color: var(--gold, #d4af37);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, .15);
+}
 
+/* BUTTONS */
+#updateProfileBtn,
+#changePasswordBtn {
+    background: #111;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: .3s;
+}
 
+#updateProfileBtn:hover,
+#changePasswordBtn:hover {
+    background: var(--gold, #d4af37);
+    color: #111;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(212, 175, 55, .35);
+}
+
+/* =====================================
+   COMPANY DETAILS
+===================================== */
+.company-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.company-info div {
+    background: #111;
+    padding: 18px;
+    border-radius: 15px;
+}
+
+.company-info p {
+    color: #aaa;
+    margin: 0;
+    font-size: 14px;
+}
+
+.company-info span {
+    display: block;
+    margin-top: 8px;
+    color: var(--gold, #d4af37);
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* SECURITY FIELD SIZE */
+.security-card input {
+    max-width: 100%;
+}
+
+#profileMessage {
+    margin-top: 15px;
+    font-weight: 600;
+    color: #16a34a;
+}
+
+/* =====================================
+   RESPONSIVE DESIGN
+===================================== */
+@media(max-width: 900px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-basic h2 {
+        font-size: 26px;
+    }
+}
+
+@media(max-width: 600px) {
+    .profile-section {
+        padding: 15px;
+    }
+
+    .profile-banner {
+        padding: 25px;
+    }
+
+    .profile-photo-box,
+    .profile-photo-box img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .company-info {
+        grid-template-columns: 1fr;
+    }
 }
