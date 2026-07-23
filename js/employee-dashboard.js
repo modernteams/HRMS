@@ -246,13 +246,10 @@ hour12:true
 
 
 
-if(data.working_hours){
+if(data.working_hours != null){
 
-
-document.getElementById("workingHours")
-.innerText =
-data.working_hours + " Hours";
-
+document.getElementById("workingHours").innerText =
+formatWorkingHours(data.working_hours);
 
 }
 
@@ -832,17 +829,29 @@ difference/(1000*60)
 return minutes;
 
 }
+
+
 function formatWorkingHours(hours){
 
-    if(hours == null) return "--";
+    if(hours == null || isNaN(hours))
+        return "--";
 
-    const totalMinutes = Math.round(hours * 60);
+    const totalMinutes = Math.round(Number(hours) * 60);
 
     const h = Math.floor(totalMinutes / 60);
     const m = totalMinutes % 60;
 
-    return `${h}h ${m}m`;
+    if(h > 0 && m > 0)
+        return `${h}h ${m}m`;
+
+    if(h > 0)
+        return `${h}h`;
+
+    return `${m}m`;
+
 }
+
+
 async function getTotalBreakMinutes(){
 
 const today =
@@ -861,16 +870,15 @@ const {data,error}=await supabaseClient
 "employee_id",
 currentEmployee.id
 )
+
 .gte(
-"start_time",
-today+" 00:00:00"
+"created_at",
+today+"T00:00:00"
 )
 .lte(
-"start_time",
-today+" 23:59:59"
+"created_at",
+today+"T23:59:59"
 );
-
-
 
 if(error){
 console.log(error);
