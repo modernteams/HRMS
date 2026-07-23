@@ -1,238 +1,192 @@
-let currentUser;
+let currentUser = null;
 
+async function loadAdminProfile() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
+    if (!user) return;
+    currentUser = user;
 
-async function loadAdminProfile(){
+    const { data: profile, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
 
+    if (error) {
+        console.log("Error loading profile:", error);
+        return;
+    }
 
-const {
-data:{
-user
+    // =====================================
+    // DISPLAY DETAILS (Hero Banner & Cards)
+    // =====================================
+    const adminName = profile.full_name || "Admin Name";
+    const adminRole = profile.role || "Administrator";
+    const adminDept = profile.department || "Administration Department";
+    const adminDesig = profile.designation || "HR Administrator";
+
+    // Hero Banner Displays
+    const nameDisp = document.getElementById("adminNameDisplay");
+    if (nameDisp) nameDisp.innerText = adminName;
+
+    const desigDisp = document.getElementById("adminDesignationDisplay");
+    if (desigDisp) desigDisp.innerText = adminDesig;
+
+    const deptDisp = document.getElementById("adminDepartmentDisplay");
+    if (deptDisp) deptDisp.innerText = adminDept;
+
+    // Company/System Card Displays
+    const roleDisp = document.getElementById("adminRole");
+    if (roleDisp) roleDisp.innerText = adminRole;
+
+    const companyDeptDisp = document.getElementById("companyDept");
+    if (companyDeptDisp) companyDeptDisp.innerText = adminDept;
+
+    // =====================================
+    // FORM INPUT VALUES
+    // =====================================
+    const nameInput = document.getElementById("name");
+    if (nameInput) nameInput.value = profile.full_name || "";
+
+    const emailInput = document.getElementById("email");
+    if (emailInput) emailInput.value = profile.email || user.email;
+
+    const phoneInput = document.getElementById("phone");
+    if (phoneInput) phoneInput.value = profile.phone || "";
+
+    const deptInput = document.getElementById("department");
+    if (deptInput) deptInput.value = profile.department || "";
+
+    // =====================================
+    // PROFILE PHOTO LOAD (Fallback Included)
+    // =====================================
+    const photoImg = document.getElementById("adminPhoto");
+    if (photoImg) {
+        if (profile.profile_image) {
+            photoImg.src = profile.profile_image;
+        } else if (profile.photo_url) {
+            photoImg.src = profile.photo_url;
+        } else {
+            photoImg.src = "assets/images/default-user.png";
+        }
+
+        // Image Load Error Fallback
+        photoImg.onerror = function () {
+            this.src = "assets/images/default-user.png";
+        };
+    }
 }
 
-}=await supabaseClient.auth.getUser();
+// =====================================
+// UPDATE PROFILE BUTTON LOGIC
+// =====================================
+const updateBtn = document.getElementById("updateProfileBtn");
+if (updateBtn) {
+    updateBtn.addEventListener("click", async () => {
+        if (!currentUser) return;
 
+        const updates = {
+            full_name: document.getElementById("name").value,
+            phone: document.getElementById("phone").value,
+            department: document.getElementById("department").value
+        };
 
+        const { error } = await supabaseClient
+            .from("profiles")
+            .update(updates)
+            .eq("id", currentUser.id);
 
-if(!user)
-return;
+        const msgEl = document.getElementById("profileMessage");
 
-
-
-currentUser=user;
-
-
-
-
-const {
-
-data:profile,
-
-error
-
-}=await supabaseClient
-
-.from("profiles")
-
-.select("*")
-
-.eq(
-"id",
-user.id
-)
-
-.single();
-
-
-
-
-
-if(error){
-
-console.log(error);
-
-return;
-
+        if (error) {
+            alert(error.message);
+            if (msgEl) {
+                msgEl.style.color = "red";
+                msgEl.innerText = "Failed to Update Profile ❌";
+            }
+        } else {
+            if (msgEl) {
+                msgEl.style.color = "#16a34a";
+                msgEl.innerText = "Profile Updated Successfully ✅";
+            }
+            // Realtime Update Top Name Display
+            const nameDisp = document.getElementById("adminNameDisplay");
+            if (nameDisp) nameDisp.innerText = updates.full_name;
+        }
+    });
 }
 
+// =====================================
+// PHOTO UPLOAD & CHANGE LOGIC
+// =====================================
+const photoInput = document.getElementById("profilePhoto");
+if (photoInput) {
+    photoInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file || !currentUser) return;
 
+        if (file.size > 2 * 1024 * 1024) {
+            alert("File size must be under 2MB!");
+            return;
+        }
 
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const base64Image = event.target.result;
 
-document.getElementById(
-"profileName"
-).innerText =
+            // Instant UI Preview
+            const photoImg = document.getElementById("adminPhoto");
+            if (photoImg) photoImg.src = base64Image;
 
-profile.full_name || "Admin";
+            // Database Update
+            const { error } = await supabaseClient
+                .from("profiles")
+                .update({ profile_image: base64Image })
+                .eq("id", currentUser.id);
 
+            if (error) {
+                console.error("Photo Update Error:", error);
+                alert("Failed to update profile picture!");
+            } else {
+                const msgEl = document.getElementById("profileMessage");
+                if (msgEl) {
+                    msgEl.style.color = "#f3dd18";
+                    msgEl.innerText = "Profile Picture Updated ✅";
+                }
+            }
+        };
 
-
-
-document.getElementById(
-"profileRole"
-).innerText =
-
-profile.role || "admin";
-
-
-
-
-
-document.getElementById(
-"fullName"
-).value =
-
-profile.full_name || "";
-
-
-
-
-
-document.getElementById(
-"email"
-).value =
-
-profile.email || user.email;
-
-
-
-
-document.getElementById(
-"phone"
-).value =
-
-profile.phone || "";
-
-
-
-
-
-document.getElementById(
-"department"
-).value =
-
-profile.department || "";
-
-
-
-
-
-document.getElementById(
-"designation"
-).value =
-
-profile.designation || "";
-
-
-
-
-
-document.getElementById(
-"role"
-).value =
-
-profile.role || "admin";
-
-
-
-
-
-
-if(profile.photo_url){
-
-document.getElementById(
-"profilePhoto"
-).src =
-profile.photo_url;
-
+        reader.readAsDataURL(file);
+    });
 }
 
+// =====================================
+// CHANGE PASSWORD LOGIC
+// =====================================
+const pwdBtn = document.getElementById("changePasswordBtn");
+if (pwdBtn) {
+    pwdBtn.addEventListener("click", async () => {
+        const newPassword = document.getElementById("newPassword").value;
 
+        if (!newPassword || newPassword.length < 6) {
+            alert("Password must be at least 6 characters long.");
+            return;
+        }
 
+        const { error } = await supabaseClient.auth.updateUser({
+            password: newPassword 
+        });
+
+        if (error) {
+            alert(error.message);
+        } else {
+            alert("Password Changed Successfully! ✅");
+            document.getElementById("newPassword").value = "";
+            const oldPwd = document.getElementById("oldPassword");
+            if (oldPwd) oldPwd.value = "";
+        }
+    });
 }
 
-
-
-
-
-
-
-document
-
-.getElementById(
-"updateProfile"
-)
-
-.addEventListener(
-
-"click",
-
-async()=>{
-
-
-const updates={
-
-
-full_name:
-document.getElementById("fullName").value,
-
-
-phone:
-document.getElementById("phone").value,
-
-
-department:
-document.getElementById("department").value,
-
-
-designation:
-document.getElementById("designation").value
-
-
-};
-
-
-
-const {
-
-error
-
-}=await supabaseClient
-
-.from("profiles")
-
-.update(updates)
-
-.eq(
-"id",
-currentUser.id
-);
-
-
-
-
-if(error){
-
-alert(error.message);
-
-}
-
-else{
-
-document.getElementById(
-"profileMessage"
-).innerText =
-"Profile Updated Successfully ✅";
-
-
-}
-
-
-
-});
-
-
-
-
-
-
+// INITIAL LOAD
 loadAdminProfile();
