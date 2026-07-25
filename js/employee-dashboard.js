@@ -1,43 +1,208 @@
+// =======================================
+// EMPLOYEE DASHBOARD
+// PART 1
+// User + Profile + Attendance + Timer
+// =======================================
+
+
 let currentEmployee = null;
 let workingTimer = null;
 
 
+// =======================================
+// LOAD EMPLOYEE DASHBOARD
+// =======================================
+
 async function loadEmployeeDashboard(){
 
-// ===============================
-// DYNAMIC USER GREETING
-// ===============================
 
-async function updateGreeting(){
-
-const greetingElement = 
-document.getElementById("greetingText");
+    await updateGreeting();
 
 
-if(!greetingElement){
-    return;
+    const {
+        data:{user}
+    } = await supabaseClient.auth.getUser();
+
+
+
+    if(!user){
+
+        console.log("No logged in user");
+        return;
+
+    }
+
+
+
+    const email = user.email;
+
+
+
+    const {data:profile,error} = await supabaseClient
+
+    .from("profiles")
+
+    .select("*")
+
+    .eq("email",email)
+
+    .single();
+
+
+
+    if(error){
+
+        console.log(
+            "Profile Error:",
+            error
+        );
+
+        return;
+
+    }
+
+
+
+    if(!profile){
+
+        alert(
+            "Profile not found"
+        );
+
+        return;
+
+    }
+
+
+
+    currentEmployee = profile;
+
+
+
+    console.log(
+        "Current Employee:",
+        currentEmployee
+    );
+
+
+
+    const name =
+    document.getElementById(
+        "employeeName"
+    );
+
+
+    if(name){
+
+        name.innerText =
+        profile.full_name;
+
+    }
+
+
+
+    const department =
+    document.getElementById(
+        "employeeDepartment"
+    );
+
+
+    if(department){
+
+        department.innerText =
+        profile.department || "-";
+
+    }
+
+
+
+    const designation =
+    document.getElementById(
+        "employeeDesignation"
+    );
+
+
+    if(designation){
+
+        designation.innerText =
+        profile.designation || "-";
+
+    }
+
+
+
+    const photo =
+    document.getElementById(
+        "employeePhoto"
+    );
+
+
+    if(photo && profile.profile_image){
+
+        photo.src =
+        profile.profile_image;
+
+    }
+
+
+
+    await loadTodayAttendance();
+
+    await restoreActiveBreak();
+
+    await loadAnnouncements();
+
+
 }
 
 
-const hour = new Date().getHours();
+
+// =======================================
+// GREETING
+// =======================================
 
 
-let greeting="";
+async function updateGreeting(){
 
 
-if(hour >= 5 && hour < 12){
+
+const greetingBox =
+document.getElementById(
+    "greetingText"
+);
+
+
+
+if(!greetingBox){
+
+    return;
+
+}
+
+
+
+const hour =
+new Date().getHours();
+
+
+
+let greeting;
+
+
+
+if(hour >=5 && hour <12){
 
     greeting="Good Morning";
 
 }
 
-else if(hour >= 12 && hour < 17){
+else if(hour >=12 && hour <17){
 
     greeting="Good Afternoon";
 
 }
 
-else if(hour >= 17 && hour < 21){
+else if(hour >=17 && hour <21){
 
     greeting="Good Evening";
 
@@ -51,21 +216,21 @@ else{
 
 
 
-// get logged in user
 
-const {data:{user}} = 
-await supabaseClient.auth.getUser();
+const {
+    data:{user}
+}=await supabaseClient.auth.getUser();
 
 
 
-let userName="User";
+let name="User";
 
 
 
 if(user){
 
 
-const {data:profile,error}=
+const {data:profile}=
 
 await supabaseClient
 
@@ -73,7 +238,10 @@ await supabaseClient
 
 .select("full_name")
 
-.eq("id",user.id)
+.eq(
+"id",
+user.id
+)
 
 .single();
 
@@ -81,7 +249,8 @@ await supabaseClient
 
 if(profile){
 
-userName = profile.full_name;
+    name =
+    profile.full_name;
 
 }
 
@@ -90,84 +259,10 @@ userName = profile.full_name;
 
 
 
-greetingElement.innerHTML =
+greetingBox.innerHTML =
 
-`${greeting}, ${userName} 👋`;
+`${greeting}, ${name} 👋`;
 
-
-}
-
-
-
-updateGreeting();
-
-const user =
-await supabaseClient.auth.getUser();
-
-
-
-const email =
-user.data.user.email;
-
-
-
-const {data:profile,error}=await supabaseClient
-.from("profiles")
-.select("*")
-.eq("email",email)
-.single();
-
-
-
-if(!profile){
-
-console.log("Profile not found");
-
-return;
-
-}
-
-
-
-currentEmployee = profile;
-
-if(profile){
-
-document.getElementById("employeeName")
-.innerText =
-profile.full_name;
-
-document.getElementById("employeeDepartment")
-.innerText =
-profile.department;
-
-
-document.getElementById("employeeDesignation")
-.innerText =
-profile.designation;
-
-
-// PROFILE PHOTO
-
-if(profile.profile_image){
-
-document.getElementById("employeePhoto").src =
-profile.profile_image;
-
-}
-
-
-}
-
-currentEmployee = profile;
-
-
-console.log("Current Employee:",currentEmployee);
-
-loadTodayAttendance();
-
-
-loadAnnouncements();
 
 
 }
@@ -175,51 +270,97 @@ loadAnnouncements();
 
 
 
-
+// =======================================
+// LOAD TODAY ATTENDANCE
+// =======================================
 
 
 async function loadTodayAttendance(){
 
 
-const today =
-new Date().toLocaleDateString(
-"en-CA",
-{
-timeZone:"Asia/Kolkata"
+
+if(!currentEmployee){
+
+    return;
+
 }
+
+
+
+const today =
+
+new Date().toLocaleDateString(
+    "en-CA",
+    {
+        timeZone:"Asia/Kolkata"
+    }
 );
 
 
-console.log("Today:",today);
 
-const {data,error}=await supabaseClient
+const {
+    data,
+    error
+}
+
+=
+await supabaseClient
+
 .from("attendance")
+
 .select("*")
+
 .eq(
 "employee_id",
 currentEmployee.id
 )
+
 .eq(
 "attendance_date",
 today
 )
+
 .maybeSingle();
+
+
 
 
 
 if(error){
 
-console.log(error);
-return;
+    console.log(error);
+    return;
 
 }
 
-console.log("Attendance Data:",data);
 
-if(data){
+
+
+
+console.log(
+"Today Attendance:",
+data
+);
+
+
+
+
+
+if(!data){
+
+    return;
+
+}
+
+
+
+
 
 const statusBox =
-document.getElementById("todayStatus");
+document.getElementById(
+"todayStatus"
+);
+
 
 
 if(statusBox){
@@ -227,73 +368,181 @@ if(statusBox){
 
 if(data.check_in && !data.check_out){
 
-statusBox.innerText = "Active";
+    statusBox.innerText =
+    "Active";
 
 }
 
 
 else if(data.check_in && data.check_out){
 
-statusBox.innerText = "Completed";
+    statusBox.innerText =
+    "Completed";
 
 }
 
 
 else{
 
-statusBox.innerText = "Inactive";
+    statusBox.innerText =
+    "Inactive";
 
 }
 
 
 }
 
-if(data.check_in){
+// ===============================
+// ATTENDANCE STATUS
+// Present / Completed / Absent
+// ===============================
+
+
+const attendanceStatus =
+document.getElementById(
+    "attendanceStatus"
+);
+
+
+
+if(attendanceStatus){
+
+
+if(data.check_in && !data.check_out){
+
+
+attendanceStatus.innerText =
+"Present";
+
+
+}
+
+
+
+else if(data.check_in && data.check_out){
+
+
+attendanceStatus.innerText =
+"Completed";
+
+
+}
+
+
+
+else{
+
+
+attendanceStatus.innerText =
+"Absent";
+
+
+}
+
+
+
+}
+
+
+const checkIn =
+document.getElementById(
+"checkInTime"
+);
+
+
+
+if(checkIn && data.check_in){
+
+
+checkIn.innerText =
+
+formatTime(
+data.check_in
+);
+
+
+}
+
+
+
+
+
+const checkOut =
+document.getElementById(
+"checkOutTime"
+);
+
+
+
+if(checkOut && data.check_out){
+
+
+checkOut.innerText =
+
+formatTime(
+data.check_out
+);
+
+
+}
+
+
+
+
+
+if(data.check_in && !data.check_out){
+
+
 startWorkingTimer(data);
-document.getElementById("checkInTime")
-.innerText =
-new Date(data.check_in).toLocaleTimeString(
-"en-IN",
-{
-timeZone:"Asia/Kolkata",
-hour:"2-digit",
-minute:"2-digit",
-hour12:true
+
+
 }
+
+
+
+
+const working =
+document.getElementById(
+"workingHours"
 );
+
+
+
+if(working){
+
+
+if(data.active_break_type){
+
+working.innerText =
+"On Break";
+
+
 }
 
+else if(data.working_hours != null){
 
 
-if(data.check_out){
+working.innerText =
 
-document.getElementById("checkOutTime")
-.innerText =
-new Date(data.check_out).toLocaleTimeString(
-"en-IN",
-{
-timeZone:"Asia/Kolkata",
-hour:"2-digit",
-minute:"2-digit",
-hour12:true
-}
+formatWorkingHours(
+data.working_hours
 );
-}
-
-
-
-if(data.working_hours != null){
-
-document.getElementById("workingHours").innerText =
-formatWorkingHours(data.working_hours);
-
-}
-
 
 
 }
 
+
 }
+
+
+
+}
+
+
+
+// =======================================
+// LIVE WORKING TIMER
+// =======================================
 
 function startWorkingTimer(attendance){
 
@@ -301,35 +550,39 @@ function startWorkingTimer(attendance){
 clearInterval(workingTimer);
 
 
+workingTimer=setInterval(async()=>{
 
-workingTimer = setInterval(()=>{
+
+const {data:newAttendance}=await supabaseClient
+.from("attendance")
+.select("*")
+.eq("id",attendance.id)
+.single();
 
 
-if(!attendance.check_in){
 
+if(!newAttendance)
 return;
 
-}
 
 
-// agar break chal raha hai
+if(newAttendance.active_break_type){
 
-if(attendance.active_break_type){
 
 document.getElementById(
 "workingHours"
-).innerText =
-"On Break";
+).innerText="On Break";
+
 
 return;
 
 }
+
 
 
 
 const start =
-new Date(attendance.check_in);
-
+new Date(newAttendance.check_in);
 
 
 const now =
@@ -339,34 +592,30 @@ new Date();
 
 let minutes =
 Math.floor(
-(now-start)/(1000*60)
+(now-start)/60000
 );
 
 
 
-let breakMinutes =
-attendance.total_break_minutes || 0;
+minutes -= 
+newAttendance.total_break_minutes || 0;
 
 
 
-minutes =
-minutes - breakMinutes;
+if(minutes<0)
+minutes=0;
 
 
 
-let h =
-Math.floor(minutes/60);
+let h=Math.floor(minutes/60);
 
-
-
-let m =
-minutes%60;
+let m=minutes%60;
 
 
 
 document.getElementById(
 "workingHours"
-).innerText =
+).innerText=
 `${h}h ${m}m`;
 
 
@@ -377,50 +626,128 @@ document.getElementById(
 }
 
 
-// ==========================
-// CHECK IN
-// ==========================
 
 
-document
-.getElementById("checkInBtn")
-.addEventListener(
-"click",
-async()=>{
+// =======================================
+// FORMAT FUNCTIONS
+// =======================================
 
-const today =
-new Date().toLocaleDateString(
-"en-CA",
-{
-timeZone:"Asia/Kolkata"
+
+function formatTime(timestamp){
+
+
+if(!timestamp){
+
+return "--";
+
 }
+
+
+
+return new Date(timestamp)
+
+.toLocaleTimeString(
+"en-IN",
+{
+
+timeZone:"Asia/Kolkata",
+
+hour:"2-digit",
+
+minute:"2-digit",
+
+hour12:true
+
+}
+
 );
 
-const now = new Date().toISOString();
 
-const {data:exist}=await supabaseClient
-.from("attendance")
-.select("*")
-.eq(
-"employee_id",
-currentEmployee.id
-)
-.eq(
-"attendance_date",
-today
-)
-.maybeSingle()
+
+}
 
 
 
+function formatWorkingHours(hours){
 
 
-if(exist){
+if(
+hours===null ||
+hours===undefined ||
+isNaN(hours)
+){
+
+return "--";
+
+}
+
+
+
+const minutes =
+
+Math.round(
+Number(hours)*60
+);
+
+
+
+const h =
+
+Math.floor(
+minutes/60
+);
+
+
+
+const m =
+
+minutes%60;
+
+
+
+if(h && m){
+
+return `${h}h ${m}m`;
+
+}
+
+
+
+if(h){
+
+return `${h}h`;
+
+}
+
+
+
+return `${m}m`;
+
+}
+
+// =======================================
+// PART 2
+// CHECK IN + CHECK OUT + GPS
+// =======================================
+
+
+
+// =======================================
+// CHECK IN
+// =======================================
+
+
+async function employeeCheckIn(){
+
+
+
+if(!currentEmployee){
 
 
 alert(
-"You already checked in"
+"Employee not loaded"
 );
+
 
 return;
 
@@ -430,11 +757,70 @@ return;
 
 
 
+const today =
 
-// GPS VERIFY FIRST
+new Date().toLocaleDateString(
+"en-CA",
+{
+timeZone:"Asia/Kolkata"
+}
+);
+
+
+
+
+
+const {
+data:existing
+}
+
+=
+
+await supabaseClient
+
+.from("attendance")
+
+.select("*")
+
+.eq(
+"employee_id",
+currentEmployee.id
+)
+
+.eq(
+"attendance_date",
+today
+)
+
+.maybeSingle();
+
+
+
+
+
+if(existing){
+
+
+alert(
+"You already checked in today"
+);
+
+
+return;
+
+
+}
+
+
+
+
+// GPS CHECK
 
 const location =
+
 await verifyOfficeLocation();
+
+
 
 
 
@@ -446,18 +832,14 @@ return;
 
 
 
+
+
 if(!location.allowed){
 
 
 alert(
 "❌ You are outside office area"
 );
-
-
-document.getElementById(
-"attendanceMessage"
-).innerText =
-"Location not verified";
 
 
 return;
@@ -469,10 +851,23 @@ return;
 
 
 
-const {error}=await supabaseClient
-.from("attendance")
-.insert({
+const now =
 
+new Date().toISOString();
+
+
+
+
+
+const {error}
+
+=
+
+await supabaseClient
+
+.from("attendance")
+
+.insert({
 
 employee_id:
 currentEmployee.id,
@@ -485,7 +880,10 @@ today,
 check_in:
 now,
 
-status:"Present",
+
+status:
+"Present",
+
 
 checkin_latitude:
 location.latitude,
@@ -495,48 +893,93 @@ checkin_longitude:
 location.longitude,
 
 
-location_verified:true
-
+location_verified:
+true
 
 
 });
 
+
+
+
+
+
 if(error){
-    alert(error.message);
-}else{
 
-    alert("✅ Check In Successful");
 
-    document.getElementById("attendanceMessage").innerText =
-    "Check In Successful";
+console.log(error);
 
-    loadTodayAttendance();
+
+alert(
+error.message
+);
+
+
+return;
+
 
 }
 
-});
+
+
+
+
+alert(
+"✅ Check In Successful"
+);
 
 
 
 
 
+const message =
+
+document.getElementById(
+"attendanceMessage"
+);
+
+
+
+if(message){
+
+message.innerText =
+"Check In Successful";
+
+}
 
 
 
 
-// ==========================
+
+await loadTodayAttendance();
+
+
+
+}
+
+
+
+
+
+// =======================================
 // CHECK OUT
-// ==========================
+// =======================================
+
+
+async function employeeCheckOut(){
 
 
 
-document
-.getElementById("checkOutBtn")
-.addEventListener(
-"click",
-async()=>{
+if(!currentEmployee){
+
+return;
+
+}
+
+
 
 const today =
+
 new Date().toLocaleDateString(
 "en-CA",
 {
@@ -544,30 +987,42 @@ timeZone:"Asia/Kolkata"
 }
 );
 
-const now = new Date().toISOString();
 
 
 
+const {
 
-const {data}=await supabaseClient
+data:attendance
+
+}
+
+=
+
+await supabaseClient
+
 .from("attendance")
+
 .select("*")
+
 .eq(
 "employee_id",
 currentEmployee.id
 )
+
 .eq(
 "attendance_date",
 today
 )
-.maybeSingle()
+
+.maybeSingle();
 
 
 
 
 
 
-if(!data){
+
+if(!attendance){
 
 
 alert(
@@ -581,119 +1036,232 @@ return;
 }
 
 
-if (data.check_out) {
-    alert("You have already checked out today.");
-    return;
-}
-const totalBreakMinutes =
-await getTotalBreakMinutes();
 
 
-const totalMinutes =
-calculateHours(
-data.check_in,
-now
+
+if(attendance.check_out){
+
+
+alert(
+"Already Checked Out"
 );
 
 
-const finalMinutes =
-totalMinutes - totalBreakMinutes;
+return;
 
 
-const finalHours =
+}
+
+
+
+
+
+
+const now =
+
+new Date().toISOString();
+
+
+
+
+
+
+const totalBreak =
+
+await getTotalBreakMinutes();
+
+
+
+
+
+
+const totalMinutes =
+
+calculateHours(
+
+attendance.check_in,
+
+now
+
+);
+
+
+
+
+
+
+let finalMinutes =
+
+totalMinutes - totalBreak;
+
+
+
+
+
+if(finalMinutes < 0){
+
+finalMinutes=0;
+
+}
+
+
+
+
+
+const workingHours =
+
 finalMinutes / 60;
 
-const {error}=await supabaseClient
-.from("attendance")
-.update({
 
+
+
+
+
+
+const {error}
+
+=
+
+await supabaseClient
+
+.from("attendance")
+
+.update({
 
 check_out:
 now,
 
-status:"Completed",
+
+status:
+"Completed",
+
 
 working_hours:
-Number(finalHours.toFixed(2)),
+
+Number(
+workingHours.toFixed(2)
+),
 
 
 total_break_minutes:
-totalBreakMinutes
+
+totalBreak
 
 
 })
+
 .eq(
 "id",
-data.id
+attendance.id
 );
+
+
+
+
+
+
 
 
 if(error){
 
 
-alert(error.message);
+alert(
+error.message
+);
+
+
+return;
 
 
 }
 
-else{
 
 
-alert("Check Out Successful");
+
+
+alert(
+"✅ Check Out Successful"
+);
+
+
+
+
+const message =
 
 document.getElementById(
 "attendanceMessage"
-)
-.innerText=
+);
+
+
+
+if(message){
+
+message.innerText =
 "Check Out Successful";
+
+}
+
+
+
 
 
 await loadTodayAttendance();
 
+
+
 }
 
-});
 
-function formatTime(timestamp){
-    if(!timestamp) return "--";
 
-    return new Date(timestamp).toLocaleTimeString("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true
-    });
-}
 
-// ===============================
-// GPS LOCATION CHECK
-// ===============================
+
+// =======================================
+// GPS OFFICE LOCATION VERIFY
+// =======================================
+
+
 async function verifyOfficeLocation(){
 
 
-return new Promise(async(resolve)=>{
+
+return new Promise(
+async(resolve)=>{
 
 
-// GPS AVAILABLE CHECK
 
 if(!navigator.geolocation){
 
+
+
 alert(
-"GPS is not supported on this device"
+"GPS not supported"
 );
+
+
 
 resolve(null);
 
+
 return;
+
 
 }
 
 
 
 
-// GET OFFICE LOCATION
 
 
-const {data:office,error}=
+
+const {
+
+data:office,
+
+error
+
+}
+
+=
 
 await supabaseClient
 
@@ -702,6 +1270,8 @@ await supabaseClient
 .select("*")
 
 .single();
+
+
 
 
 
@@ -717,9 +1287,12 @@ alert(
 
 resolve(null);
 
+
 return;
 
+
 }
+
 
 
 
@@ -735,12 +1308,16 @@ navigator.geolocation.getCurrentPosition(
 
 
 const userLat =
+
 position.coords.latitude;
 
 
 
 const userLng =
+
 position.coords.longitude;
+
+
 
 
 
@@ -764,11 +1341,12 @@ office.longitude
 
 
 
+
 console.log(
-"Distance From Office:",
-distance,
-"meters"
+"Distance:",
+distance
 );
+
 
 
 
@@ -783,7 +1361,9 @@ resolve({
 
 allowed:true,
 
+
 latitude:userLat,
+
 
 longitude:userLng
 
@@ -805,6 +1385,7 @@ allowed:false
 });
 
 
+
 }
 
 
@@ -816,15 +1397,15 @@ allowed:false
 (error)=>{
 
 
+
 console.log(
-"GPS ERROR",
 error
 );
 
 
 
 alert(
-"Please enable GPS permission"
+"Please allow GPS permission"
 );
 
 
@@ -845,7 +1426,6 @@ timeout:15000,
 
 maximumAge:0
 
-
 }
 
 
@@ -857,12 +1437,20 @@ maximumAge:0
 });
 
 
+
 }
 
 
 
 
+
+
+
+
+// =======================================
 // DISTANCE CALCULATOR
+// =======================================
+
 
 function calculateDistance(
 lat1,
@@ -872,297 +1460,234 @@ lon2
 ){
 
 
+
 const R = 6371000;
 
 
+
 const dLat =
-(lat2-lat1) *
+
+(lat2-lat1)
+
+*
+
 Math.PI/180;
+
+
 
 
 const dLon =
-(lon2-lon1) *
+
+(lon2-lon1)
+
+*
+
 Math.PI/180;
+
+
 
 
 
 const a =
+
+
 Math.sin(dLat/2) *
+
 Math.sin(dLat/2)
+
+
 
 +
 
-Math.cos(lat1*Math.PI/180)
+Math.cos(
+lat1*Math.PI/180
+)
+
 *
-Math.cos(lat2*Math.PI/180)
+
+Math.cos(
+lat2*Math.PI/180
+)
+
 *
+
 Math.sin(dLon/2)
+
 *
+
 Math.sin(dLon/2);
 
 
 
+
+
+
+
 const c =
+
 2 *
+
 Math.atan2(
+
 Math.sqrt(a),
+
 Math.sqrt(1-a)
+
 );
+
+
+
 
 
 
 return R*c;
 
 
+
 }
 
 
 
-// ==========================
+
+
+
+
+
+// =======================================
 // HOURS CALCULATOR
-// ==========================
-function calculateHours(start,end){
+// =======================================
+
+
+function calculateHours(
+start,
+end
+){
+
 
 
 const startTime =
+
 Date.parse(start);
 
 
+
 const endTime =
+
 Date.parse(end);
 
 
-const difference =
+
+
+const diff =
+
 endTime-startTime;
 
 
-// minutes
-
-const minutes =
-Math.floor(
-difference/(1000*60)
-);
 
 
-return minutes;
+return Math.floor(
 
-}
+diff / 60000
 
-
-function formatWorkingHours(hours){
-
-    if(hours == null || isNaN(hours))
-        return "--";
-
-    const totalMinutes = Math.round(Number(hours) * 60);
-
-    const h = Math.floor(totalMinutes / 60);
-    const m = totalMinutes % 60;
-
-    if(h > 0 && m > 0)
-        return `${h}h ${m}m`;
-
-    if(h > 0)
-        return `${h}h`;
-
-    return `${m}m`;
-
-}
-
-
-async function getTotalBreakMinutes(){
-
-const today =
-new Date().toLocaleDateString(
-"en-CA",
-{
-timeZone:"Asia/Kolkata"
-}
-);
-
-
-const {data,error}=await supabaseClient
-.from("employee_breaks")
-.select("duration_minutes")
-.eq(
-"employee_id",
-currentEmployee.id
-)
-
-.gte(
-"created_at",
-today+"T00:00:00"
-)
-.lte(
-"created_at",
-today+"T23:59:59"
-);
-
-if(error){
-console.log(error);
-return 0;
-}
-
-
-
-let total=0;
-
-
-data.forEach(item=>{
-
-total += item.duration_minutes || 0;
-
-});
-
-
-return total;
-
-
-}
-async function loadAnnouncements(){
-
-
-const {data,error}=await supabaseClient
-.from("announcements")
-.select("*")
-.order(
-"created_at",
-{
-ascending:false
-}
-)
-.limit(3);
-
-
-
-if(error){
-
-console.log(error);
-return;
-
-}
-
-
-let box =
-document.getElementById(
-"announcementPreview"
 );
 
 
 
-if(!box){
-    return;
 }
 
+// =======================================
+// PART 3
+// BREAK MANAGEMENT SYSTEM
+// =======================================
 
-
-box.innerHTML="";
-
-
-
-data.forEach(item=>{
-
-
-box.innerHTML+=`
-
-<div class="activity">
-
-📢 ${item.title}
-
-</div>
-
-`;
-
-});
-
-
-}
-
-
-function autoRefreshAtMidnight(){
-
-    const now = new Date();
-
-    const midnight = new Date();
-
-    midnight.setHours(24,0,0,0);
-
-    const ms = midnight - now;
-
-    setTimeout(() => {
-
-        location.reload();
-
-    }, ms);
-
-}
-
-autoRefreshAtMidnight();
-// =====================================
-// BREAK MANAGEMENT
-// =====================================
 
 
 let breakTimerInterval = null;
 let breakStartTime = null;
 
 
+
+
+// =======================================
 // START BREAK
+// =======================================
+
 
 async function startBreak(type){
 
 
+
 if(!currentEmployee){
 
-alert("Employee not found");
+
+alert(
+"Employee not loaded"
+);
+
+
 return;
+
 
 }
 
 
-// check running break
 
-const {data:active}=await supabaseClient
+
+// check active break
+
+
+const {
+
+data:active
+
+}
+
+=
+
+await supabaseClient
+
 .from("employee_breaks")
+
 .select("*")
-.eq("employee_id",currentEmployee.id)
-.is("end_time",null)
+
+.eq(
+"employee_id",
+currentEmployee.id
+)
+
+.is(
+"end_time",
+null
+)
+
 .maybeSingle();
+
+
+
 
 
 
 if(active){
 
-alert("Already break running");
+
+alert(
+"Already break running"
+);
+
 
 return;
 
+
 }
 
-const startTime = new Date(
-new Date().toLocaleString(
-"en-US",
-{
-timeZone:"Asia/Kolkata"
-}
-)
-);
 
-const {error}=await supabaseClient
-.from("employee_breaks")
-.insert({
 
-employee_id:currentEmployee.id,
 
-break_type:type,
 
-start_time:startTime
 
-});
-
-// UPDATE ATTENDANCE LIVE STATUS
 
 const today =
+
 new Date().toLocaleDateString(
 "en-CA",
 {
@@ -1171,42 +1696,145 @@ timeZone:"Asia/Kolkata"
 );
 
 
+
+
+
+
+
+const startTime =
+
+new Date().toISOString();
+
+
+
+
+
+
+const {
+
+error
+
+}
+
+=
+
 await supabaseClient
+
+.from("employee_breaks")
+
+.insert({
+
+employee_id:
+currentEmployee.id,
+
+
+break_type:
+type,
+
+
+start_time:
+startTime,
+
+
+attendance_date:
+today
+
+
+});
+
+
+
+
+
+
+
+if(error){
+
+
+alert(
+error.message
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+// update attendance status
+
+
+await supabaseClient
+
 .from("attendance")
+
 .update({
 
-active_break_type:type,
+active_break_type:
+type,
 
-break_start_time:startTime,
 
-status:"On Break"
+break_start_time:
+startTime,
+
+
+status:
+"On Break"
 
 })
+
 .eq(
 "employee_id",
 currentEmployee.id
 )
+
 .eq(
 "attendance_date",
 today
 );
 
-if(error){
 
-alert(error.message);
-return;
+
+
+
+
+
+breakStartTime =
+new Date(startTime);
+
+
+
+
+
+
+const status =
+
+document.getElementById(
+"breakStatus"
+);
+
+
+
+if(status){
+
+status.innerText =
+type+" Break Started";
 
 }
 
 
-// important for timer
-
-breakStartTime = startTime;
 
 
 
-document.getElementById("breakStatus").innerText =
-type+" Break Started";
+clearInterval(
+workingTimer
+);
 
 
 
@@ -1218,70 +1846,312 @@ startBreakTimer();
 
 
 
+
+
+
+
+
+// =======================================
 // END BREAK
+// =======================================
 
 
 async function endBreak(){
 
 
-const {data:active,error}=await supabaseClient
+
+
+
+const {
+
+data:active,
+
+error
+
+}
+
+=
+
+await supabaseClient
+
 .from("employee_breaks")
+
 .select("*")
-.eq("employee_id",currentEmployee.id)
-.is("end_time",null)
-.single();
+
+.eq(
+"employee_id",
+currentEmployee.id
+)
+
+.is(
+"end_time",
+null
+)
+
+.maybeSingle();
+
+
+
 
 
 
 if(error || !active){
 
-alert("No active break");
+
+alert(
+"No active break"
+);
+
 
 return;
 
+
 }
 
-const endTime = new Date(
-new Date().toLocaleString(
-"en-US",
-{
-timeZone:"Asia/Kolkata"
+
+
+
+
+
+
+
+const endTime =
+
+new Date();
+
+
+
+
+const startTime =
+
+new Date(
+active.start_time
+);
+
+
+
+
+
+const minutes =
+
+Math.floor(
+
+(endTime-startTime)
+
+/
+
+60000
+
+);
+
+
+
+
+
+
+const {
+
+error:updateError
+
 }
-)
-);
 
-const startTime = new Date(
-new Date(active.start_time).toLocaleString(
-"en-US",
-{
-timeZone:"Asia/Kolkata"
-}
-)
-);
+=
 
-const diffMilliseconds =
-endTime - startTime;
+await supabaseClient
 
-
-const minutes = Math.floor(
-    diffMilliseconds / 60000
-);
-
-const {error:updateError}=await supabaseClient
 .from("employee_breaks")
+
 .update({
 
-end_time:endTime,
+end_time:
+endTime.toISOString(),
 
-duration_minutes:minutes
+
+duration_minutes:
+minutes
+
 
 })
+
 .eq(
 "id",
 active.id
 );
 
-// REMOVE BREAK STATUS FROM ATTENDANCE
+
+
+
+
+
+
+if(updateError){
+
+
+alert(
+updateError.message
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+const today =
+
+new Date().toLocaleDateString(
+"en-CA",
+{
+timeZone:"Asia/Kolkata"
+}
+);
+
+
+
+
+
+
+const totalBreak =
+
+await getTotalBreakMinutes();
+
+
+
+
+
+
+
+await supabaseClient
+
+.from("attendance")
+
+.update({
+
+active_break_type:null,
+
+
+break_start_time:null,
+
+
+status:
+"Present",
+
+
+total_break_minutes:
+totalBreak
+
+
+})
+
+.eq(
+"employee_id",
+currentEmployee.id
+)
+
+.eq(
+"attendance_date",
+today
+);
+
+
+
+
+
+
+
+
+clearInterval(
+breakTimerInterval
+);
+
+
+
+
+breakStartTime=null;
+
+
+
+
+
+const timer =
+
+document.getElementById(
+"breakTimer"
+);
+
+
+
+if(timer){
+
+timer.innerText =
+"00:00:00";
+
+}
+
+
+
+
+
+const status =
+
+document.getElementById(
+"breakStatus"
+);
+
+
+
+if(status){
+
+
+status.innerText =
+
+active.break_type +
+
+" Break Ended ("+
+
+minutes+
+
+" min)";
+
+
+}
+
+
+
+
+
+
+
+await loadTodayAttendance();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =======================================
+// RESTORE ACTIVE BREAK
+// =======================================
+async function restoreActiveBreak(){
+
+
+if(!currentEmployee){
+    return;
+}
+
 
 
 const today =
@@ -1293,100 +2163,178 @@ timeZone:"Asia/Kolkata"
 );
 
 
-await supabaseClient
-.from("attendance")
-.update({
 
-active_break_type:null,
+const {data,error}=await supabaseClient
 
-break_start_time:null,
+.from("employee_breaks")
 
-status:"Present",
+.select("*")
 
-total_break_minutes:minutes
-
-})
 .eq(
 "employee_id",
 currentEmployee.id
 )
+
 .eq(
 "attendance_date",
 today
+)
+
+.is(
+"end_time",
+null
+)
+
+.maybeSingle();
+
+
+
+if(error){
+
+console.log(
+"Restore Break Error",
+error
 );
-
-if(updateError){
-
-alert(updateError.message);
 
 return;
 
 }
-clearInterval(breakTimerInterval);
 
 
 
-document.getElementById("breakTimer").innerText=
-"00:00:00";
+if(data){
 
 
-document.getElementById("breakStatus").innerText=
-active.break_type+
-" Break Ended ("+
-minutes+
-" min)";
+console.log(
+"Active Break Found",
+data
+);
 
 
-breakStartTime=null;
 
+// IMPORTANT FIX
+breakStartTime =
+new Date(data.start_time);
+
+
+
+const breakStatus =
+document.getElementById(
+"breakStatus"
+);
+
+
+if(breakStatus){
+
+breakStatus.innerText =
+data.break_type +
+" Break Running";
 
 }
 
 
 
 
-// TIMER
+const working =
+document.getElementById(
+"workingHours"
+);
 
+
+if(working){
+
+working.innerText =
+"On Break";
+
+}
+
+
+
+
+// restart timer from old start time
+
+startBreakTimer();
+
+
+
+}
+
+else{
+
+
+console.log(
+"No Active Break"
+);
+
+
+}
+
+
+
+}
+
+
+// =======================================
+// BREAK TIMER
+// =======================================
 
 function startBreakTimer(){
 
 
-clearInterval(breakTimerInterval);
+clearInterval(
+breakTimerInterval
+);
 
 
 
-breakTimerInterval=setInterval(()=>{
+breakTimerInterval = setInterval(()=>{
 
 
-if(!breakStartTime)
+if(!breakStartTime){
+
 return;
+
+}
 
 
 
 const diff =
-new Date()-breakStartTime;
+new Date() - breakStartTime;
 
 
 
-let h=Math.floor(
+let h =
+Math.floor(
 diff/(1000*60*60)
 );
 
 
 
-let m=Math.floor(
+let m =
+Math.floor(
 (diff/(1000*60))%60
 );
 
 
 
-let s=Math.floor(
+let s =
+Math.floor(
 (diff/1000)%60
 );
 
 
 
-document.getElementById("breakTimer").innerText =
+const timer =
+document.getElementById(
+"breakTimer"
+);
+
+
+
+if(timer){
+
+
+timer.innerText =
 
 String(h).padStart(2,"0")
 +
@@ -1399,8 +2347,230 @@ String(m).padStart(2,"0")
 String(s).padStart(2,"0");
 
 
+}
+
+
 
 },1000);
+
+
+}
+
+
+// =======================================
+// TOTAL BREAK MINUTES
+// =======================================
+
+
+async function getTotalBreakMinutes(){
+
+
+
+const today =
+
+new Date().toLocaleDateString(
+"en-CA",
+{
+timeZone:"Asia/Kolkata"
+}
+);
+
+
+
+
+
+
+
+const {
+
+data,
+
+error
+
+}
+
+=
+
+await supabaseClient
+
+.from("employee_breaks")
+
+.select(
+"duration_minutes"
+)
+
+.eq(
+"employee_id",
+currentEmployee.id
+)
+
+.eq(
+"attendance_date",
+today
+);
+
+
+
+
+
+
+
+if(error){
+
+
+console.log(error);
+
+
+return 0;
+
+
+}
+
+
+
+
+
+
+
+let total = 0;
+
+
+
+
+
+data.forEach(item=>{
+
+
+total +=
+
+item.duration_minutes || 0;
+
+
+});
+
+
+
+
+
+
+
+return total;
+
+
+
+}
+
+// =======================================
+// PART 4
+// EVENTS + INITIALIZATION
+// =======================================
+
+
+// =======================================
+// LOAD ANNOUNCEMENTS
+// =======================================
+
+
+async function loadAnnouncements(){
+
+
+
+const {
+
+data,
+
+error
+
+}
+
+=
+
+await supabaseClient
+
+.from("announcements")
+
+.select("*")
+
+.order(
+"created_at",
+{
+ascending:false
+}
+)
+
+.limit(3);
+
+
+
+
+
+
+if(error){
+
+
+console.log(
+"Announcement Error:",
+error
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+const box =
+
+document.getElementById(
+"announcementPreview"
+);
+
+
+
+
+
+
+if(!box){
+
+return;
+
+}
+
+
+
+
+
+
+box.innerHTML="";
+
+
+
+
+
+
+data.forEach(item=>{
+
+
+
+box.innerHTML += `
+
+<div class="activity">
+
+📢 ${item.title}
+
+</div>
+
+`;
+
+
+
+});
 
 
 
@@ -1409,41 +2579,334 @@ String(s).padStart(2,"0");
 
 
 
-// BUTTONS
 
 
-document
-.getElementById("lunchBreakBtn")
-.addEventListener(
-"click",
-()=>startBreak("Lunch")
+
+
+// =======================================
+// BUTTON EVENTS
+// =======================================
+
+
+// CHECK IN BUTTON
+
+
+const checkInBtn =
+
+document.getElementById(
+"checkInBtn"
 );
 
 
 
-document
-.getElementById("teaBreakBtn")
-.addEventListener(
+
+
+if(checkInBtn){
+
+
+
+checkInBtn.addEventListener(
+
 "click",
-()=>startBreak("Tea")
+
+()=>{
+
+
+employeeCheckIn();
+
+
+}
+
 );
 
 
 
-document
-.getElementById("otherBreakBtn")
-.addEventListener(
-"click",
-()=>startBreak("Other")
+}
+
+
+
+
+
+
+
+// CHECK OUT BUTTON
+
+
+const checkOutBtn =
+
+document.getElementById(
+"checkOutBtn"
 );
 
 
 
-document
-.getElementById("endBreakBtn")
-.addEventListener(
+
+
+if(checkOutBtn){
+
+
+
+checkOutBtn.addEventListener(
+
 "click",
-()=>endBreak()
+
+()=>{
+
+
+employeeCheckOut();
+
+
+}
+
 );
+
+
+
+}
+
+
+
+
+
+
+
+// LUNCH BREAK
+
+
+const lunchBtn =
+
+document.getElementById(
+"lunchBreakBtn"
+);
+
+
+
+
+
+if(lunchBtn){
+
+
+
+lunchBtn.addEventListener(
+
+"click",
+
+()=>{
+
+
+startBreak(
+"Lunch"
+);
+
+
+}
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+// TEA BREAK
+
+
+const teaBtn =
+
+document.getElementById(
+"teaBreakBtn"
+);
+
+
+
+
+
+if(teaBtn){
+
+
+
+teaBtn.addEventListener(
+
+"click",
+
+()=>{
+
+
+startBreak(
+"Tea"
+);
+
+
+}
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+// OTHER BREAK
+
+
+const otherBtn =
+
+document.getElementById(
+"otherBreakBtn"
+);
+
+
+
+
+
+if(otherBtn){
+
+
+
+otherBtn.addEventListener(
+
+"click",
+
+()=>{
+
+
+startBreak(
+"Other"
+);
+
+
+}
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+// END BREAK
+
+
+const endBreakBtn =
+
+document.getElementById(
+"endBreakBtn"
+);
+
+
+
+
+
+if(endBreakBtn){
+
+
+
+endBreakBtn.addEventListener(
+
+"click",
+
+()=>{
+
+
+endBreak();
+
+
+}
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+// START DASHBOARD
+
 
 loadEmployeeDashboard();
+
+
+
+
+
+
+// =======================================
+// AUTO REFRESH ATTENDANCE
+// =======================================
+
+
+setInterval(
+async()=>{
+
+
+
+if(currentEmployee){
+
+
+
+await loadTodayAttendance();
+
+
+
+}
+
+
+
+},
+30000
+);
+
+
+
+
+
+
+
+// =======================================
+// RESTORE TIMER BEFORE CLOSE
+// =======================================
+
+
+window.addEventListener(
+
+"beforeunload",
+
+()=>{
+
+
+clearInterval(
+workingTimer
+);
+
+
+
+clearInterval(
+breakTimerInterval
+);
+
+
+
+}
+
+);
