@@ -3,18 +3,31 @@
 // ======================================
 
 
-const loginBtn = document.getElementById("loginBtn");
+const loginForm =
+document.getElementById("loginForm");
 
 
-loginBtn.addEventListener("click", async()=>{
+
+loginForm.addEventListener(
+"submit",
+async(e)=>{
+
+
+    e.preventDefault();
+
 
 
     const email =
-    document.getElementById("email").value.trim();
+    document.getElementById("email")
+    .value
+    .trim();
+
 
 
     const password =
-    document.getElementById("password").value.trim();
+    document.getElementById("password")
+    .value
+    .trim();
 
 
 
@@ -23,7 +36,11 @@ loginBtn.addEventListener("click", async()=>{
 
 
 
-    console.log("Login button clicked");
+    message.innerText="Logging in...";
+
+
+
+    console.log("Login Submitted");
 
 
 
@@ -39,10 +56,14 @@ loginBtn.addEventListener("click", async()=>{
 
 
 
+
     if(error){
 
 
-        console.log("Login Error:",error);
+        console.log(
+        "Login Error:",
+        error
+        );
 
 
         message.innerText =
@@ -56,11 +77,11 @@ loginBtn.addEventListener("click", async()=>{
 
 
 
-    console.log("Login Success");
 
-    console.log("USER ID:",data.user.id);
-
-    console.log("EMAIL:",data.user.email);
+    console.log(
+    "Login Success",
+    data.user
+    );
 
 
 
@@ -68,33 +89,51 @@ loginBtn.addEventListener("click", async()=>{
 
     // GET PROFILE
 
-    const {data:profile,error:profileError}=
 
-    await supabaseClient
+    const {
+
+        data:profile,
+
+        error:profileError
+
+    } = await supabaseClient
+
 
     .from("profiles")
 
+
     .select("*")
 
-    .eq("id",data.user.id)
+
+    .eq(
+        "id",
+        data.user.id
+    )
+
 
     .single();
 
 
 
 
-    console.log("PROFILE:",profile);
 
-    console.log("PROFILE ERROR:",profileError);
+    console.log(
+    "PROFILE:",
+    profile
+    );
+
+
+    console.log(
+    "PROFILE ERROR:",
+    profileError
+    );
+
 
 
 
 
 
     if(profileError || !profile){
-
-
-        console.log(profileError);
 
 
         message.innerText =
@@ -113,32 +152,44 @@ loginBtn.addEventListener("click", async()=>{
     // ROLE REDIRECT
 
 
+
     if(profile.role==="admin"){
 
 
-        window.location.href="admin.html";
+
+        window.location.href =
+        "admin.html";
+
 
 
     }
+
 
 
     else if(profile.role==="employee"){
 
 
-        window.location.href="employee.html";
+
+        window.location.href =
+        "employee.html";
+
 
 
     }
 
 
+
     else{
+
 
 
         message.innerText =
         "Role not assigned";
 
 
+
     }
+
 
 
 
