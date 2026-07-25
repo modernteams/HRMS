@@ -385,7 +385,7 @@ adminDepartment.value.trim(),
 
 designation:
 adminDesignation.value.trim(),
-
+role:"admin"
 
 };
 
