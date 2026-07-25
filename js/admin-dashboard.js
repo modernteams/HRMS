@@ -86,7 +86,6 @@ async function loadAdminDashboard() {
     const el = document.getElementById("totalEmployees");
     if (el) el.innerText = employees.length;
 
-    // REAL DEPARTMENT OVERVIEW RENDER CALL
     renderDepartmentOverview(employees);
   }
 
@@ -137,7 +136,7 @@ async function loadAdminDashboard() {
   }
 
   // ===============================
-  // DEPARTMENTS COUNT (Stats)
+  // DEPARTMENTS COUNT
   // ===============================
   const { data: departments, error: departmentError } = await supabaseClient
     .from("departments")
@@ -150,7 +149,7 @@ async function loadAdminDashboard() {
 }
 
 // ======================================
-// DYNAMIC DEPARTMENT OVERVIEW FUNCTION
+// DYNAMIC DEPARTMENT OVERVIEW
 // ======================================
 function renderDepartmentOverview(employees) {
   const container = document.getElementById("departmentList");
@@ -164,7 +163,6 @@ function renderDepartmentOverview(employees) {
   const totalEmployees = employees.length;
   const departmentCounts = {};
 
-  // Har employee ka department count karo
   employees.forEach((emp) => {
     const deptName = emp.department || "Unassigned";
     departmentCounts[deptName] = (departmentCounts[deptName] || 0) + 1;
@@ -172,7 +170,6 @@ function renderDepartmentOverview(employees) {
 
   container.innerHTML = "";
 
-  // Dynamic progress list generate karna
   Object.keys(departmentCounts).forEach((deptName) => {
     const count = departmentCounts[deptName];
     const percentage = Math.round((count / totalEmployees) * 100);
@@ -250,7 +247,7 @@ async function loadAttendanceChart() {
 loadAttendanceChart();
 
 // =================================
-// LIVE ATTENDANCE
+// LIVE ATTENDANCE MONITOR
 // =================================
 async function loadLiveAttendance() {
   const today = new Date().toLocaleDateString("en-CA");
@@ -269,7 +266,7 @@ async function loadLiveAttendance() {
   if (!table) return;
 
   if (error) {
-    console.log(error);
+    console.log("Error loading live attendance:", error);
     return;
   }
 
@@ -278,22 +275,46 @@ async function loadLiveAttendance() {
   if (!data || data.length === 0) {
     table.innerHTML = `
       <tr>
-        <td colspan="5">No attendance today</td>
+        <td colspan="4">No attendance today</td>
       </tr>
     `;
     return;
   }
 
   data.forEach((item) => {
-    let status = item.check_out ? "🔴 Checked Out" : "🟢 Working";
-    let breakStatus = item.break_status ? "☕ Break" : "Active";
+    // Check Break Condition across various database naming conventions
+    const isOnBreak = 
+      item.break_status === true || 
+      item.break_status === "true" || 
+      item.break_status === 1 ||
+      item.is_on_break === true || 
+      item.is_on_break === "true" || 
+      item.status === "Break" || 
+      item.status === "On Break";
+
+    // Status Determination Logic
+    let status = "🟢 Working";
+    if (item.check_out) {
+      status = "🔴 Checked Out";
+    } else if (isOnBreak) {
+      status = "🟡 On Break";
+    }
+
+    // Check In Time Formatting
+    const checkInTime = item.check_in
+      ? new Date(item.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : "--";
+
+    // Check Out Time Logic: Displays "..." when working, and actual time when checked out
+    const checkOutTime = item.check_out
+      ? new Date(item.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : "...";
 
     table.innerHTML += `
       <tr>
         <td>${item.profiles?.full_name || "Employee"}</td>
-        <td>${item.check_in ? new Date(item.check_in).toLocaleTimeString() : "--"}</td>
-        <td>${item.check_out ? new Date(item.check_out).toLocaleTimeString() : "Working"}</td>
-        <td>${breakStatus}</td>
+        <td>${checkInTime}</td>
+        <td>${checkOutTime}</td>
         <td>${status}</td>
       </tr>
     `;
