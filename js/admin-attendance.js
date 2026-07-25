@@ -90,7 +90,7 @@ function getStatusClass(status){
 function getBreakSummary(att){
 
 
-if(!att.employee_breaks || att.employee_breaks.length===0){
+if(!att.breaks || att.breaks.length===0){
 
 return "0m";
 
@@ -100,7 +100,7 @@ return "0m";
 let html="";
 
 
-att.employee_breaks.forEach(b=>{
+att.breaks.forEach(b=>{
 
 
 html += `
@@ -325,7 +325,27 @@ await supabaseClient
 employeeIds
 );
 
+// FETCH APPROVED LEAVES
 
+const {data:leaveData,error:leaveError}=
+
+await supabaseClient
+.from("leave_requests")
+.select("*")
+.eq(
+"status",
+"Approved"
+);
+
+
+if(leaveError){
+
+console.log(
+"Leave Fetch Error",
+leaveError
+);
+
+}
 
 if(breakError){
 
@@ -340,17 +360,47 @@ breakError
 
 // attach breaks with attendance
 
-
 data.forEach(att=>{
 
 att.breaks =
 breakData.filter(
 (b)=>
 b.employee_id === att.employee_id
+&&
+b.attendance_date === att.attendance_date
 );
 
 });
 
+data.forEach(att=>{
+
+
+att.isOnLeave =
+leaveData.some(leave=>{
+
+
+const today = att.attendance_date;
+
+
+return (
+
+leave.employee_id === att.employee_id
+
+&&
+
+today >= leave.from_date
+
+&&
+
+today <= leave.to_date
+
+);
+
+
+});
+
+
+});
 
 // search
 
@@ -414,7 +464,46 @@ renderAttendance(attendanceData);
 // PART-2
 // Activity + Break + Table Render
 // =======================================
+function getActivity(att){
 
+
+if(att.isOnLeave){
+
+return "On Leave";
+
+}
+
+
+if(att.check_out){
+
+return "Completed";
+
+}
+
+
+if(
+att.employee_breaks &&
+att.employee_breaks.some(
+b=>!b.end_time
+)
+){
+
+return "On Break";
+
+}
+
+
+if(att.check_in){
+
+return "Working";
+
+}
+
+
+return "Absent";
+
+
+}
 
 // =======================================
 // EMPLOYEE CURRENT ACTIVITY
