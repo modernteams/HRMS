@@ -8,6 +8,13 @@
 let currentEmployee = null;
 let workingTimer = null;
 
+// =======================================
+// LOCATION CHECK ENABLE / DISABLE
+// =======================================
+
+const LOCATION_CHECK_ENABLED = false;
+// true  = GPS mandatory
+// false = Work From Home (GPS bypass)
 
 // =======================================
 // LOAD EMPLOYEE DASHBOARD
@@ -1219,10 +1226,21 @@ await loadTodayAttendance();
 // GPS OFFICE LOCATION VERIFY
 // =======================================
 
-
 async function verifyOfficeLocation(){
 
+// =======================================
+// WORK FROM HOME MODE
+// =======================================
 
+if(!LOCATION_CHECK_ENABLED){
+
+    return {
+        allowed: true,
+        latitude: null,
+        longitude: null
+    };
+
+}
 
 return new Promise(
 async(resolve)=>{
