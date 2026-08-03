@@ -1,517 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
-<link rel="stylesheet" href="css/variables.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/admin-leaves.css">
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<title>
-Modern Teams - Leaves
-</title>
-
-
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin-leaves.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Teams - Leaves</title>
 </head>
-
-
 
 <body>
 
-
-
-
-<div class="app-layout">
-
-
-
-
-
-<!-- ======================
-     SIDEBAR
-====================== -->
-<button id="menuToggle" class="menu-toggle">
-
-☰
-
-</button>
-
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-
-<aside class="sidebar">
-
-
-<div class="logo">
-
-
-<img src="assets/logo/mt-logo.jpeg" alt="Logo">
-
-
-<h2>
-Modern Teams
-</h2>
-
-
-</div>
-
-
-
-
-
-
-<nav class="menu">
-
-
-
-<a href="admin.html">
-🏠 Dashboard
-</a>
-
-
-
-<a href="admin-employees.html">
-👥 Employees
-</a>
-
-
-
-
-<a href="admin-attendance.html">
-🕒 Attendance
-</a>
-
-
-
-
-<a class="active" href="admin-leaves.html">
-📄 Leaves
-</a>
-
-
-
-
-
-<a href="admin-announcements.html">
-📢 Announcements
-</a>
-
-
-
-
-
-<a href="admin-profile.html">
-⚙ Profile
-</a>
-
-
-
-
-
-<a href="login.html" onclick="logout()">
-🚪 Logout
-</a>
-
-
-
-</nav>
-
-
-
-</aside>
-
-
-
-
-
-
-
-
-
-<!-- ======================
-     MAIN CONTENT
-====================== -->
-
-
-<main class="main-content">
-
-
-
-
-
-<header class="topbar">
-
-
-<div>
-
-
-<h1>
-Leave Management
-</h1>
-
-
-<p>
-Manage employee leave requests
-</p>
-
-
-</div>
-
-
-
-
-
-<div class="admin-info">
-
-
-<div class="notification">
-🔔
-</div>
-
-
-<div class="avatar">
-MT
-</div>
-
-
-</div>
-
-
-
-</header>
-
-
-
-
-
-
-
-
-
-<section class="content page-section leave-section">
-
-
-
-
-
-
-
-
-<!-- FILTER -->
-
-
-<div class="card filter-card">
-
-
-
-<h2>
-Leave Filters
-</h2>
-
-
-
-
-<div class="filter-grid">
-
-
-
-<div>
-
-
-<label>
-Search Employee
-</label>
-
-
-<input
-type="text"
-id="leaveSearch"
-placeholder="Search employee">
-
-
-</div>
-
-
-
-
-
-
-
-<div>
-
-
-<label>
-Status
-</label>
-
-
-<select id="leaveStatusFilter">
-
-
-<option>
-All
-</option>
-
-
-<option>
-Pending
-</option>
-
-
-<option>
-Approved
-</option>
-
-
-<option>
-Rejected
-</option>
-
-
-
-</select>
-
-
-
-</div>
-
-
-
-
-
-
-<div>
-
-
-<label>
-Leave Type
-</label>
-
-
-<select id="leaveTypeFilter">
-
-
-<option>
-All Types
-</option>
-
-
-<option>
-Casual Leave
-</option>
-
-
-<option>
-Sick Leave
-</option>
-
-
-<option>
-Emergency Leave
-</option>
-
-
-
-</select>
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- LEAVE TABLE -->
-
-
-<div class="table-card table-section">
-
-
-<h2>
-Leave Requests
-</h2>
-
-
-
-
-
-
-<table>
-
-
-
-<thead>
-
-
-<tr>
-
-
-<th>
-Employee
-</th>
-
-
-
-<th>
-Leave Type
-</th>
-
-
-
-<th>
-Reason
-</th>
-
-
-
-<th>
-From Date
-</th>
-
-
-
-<th>
-To Date
-</th>
-
-
-
-<th>
-Status
-</th>
-
-
-
-<th>
-Action
-</th>
-
-
-
-</tr>
-
-
-
-</thead>
-
-
-
-
-
-
-
-
-<tbody id="leaveTableBody">
-
-
-<tr>
-
-
-<td colspan="7">
-
-No Leave Requests Found
-
-</td>
-
-
-</tr>
-
-
-
-</tbody>
-
-
-
-
-
-
-
-</table>
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-</section>
-
-
-
-
-
-
-
-
-
-</main>
-
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-<script src="js/supabase.js"></script>
-
-
-<script src="js/auth.js"></script>
-
-
-<script src="js/admin-leaves.js"></script>
-     <script src="js/sidebar.js"></script>
-
-
-
+    <div class="app-layout">
+
+        <!-- SIDEBAR TOGGLE -->
+        <button id="menuToggle" class="menu-toggle">☰</button>
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="assets/logo/mt-logo.jpeg" alt="Logo">
+                <h2>Modern Teams</h2>
+            </div>
+
+            <nav class="menu">
+                <a href="admin.html">🏠 Dashboard</a>
+                <a href="admin-employees.html">👥 Employees</a>
+                <a href="admin-attendance.html">🕒 Attendance</a>
+                <a class="active" href="admin-leaves.html">📄 Leaves</a>
+                <a href="admin-announcements.html">📢 Announcements</a>
+                <a href="admin-holidays.html">🎉 Holidays</a>
+                <a href="admin-profile.html">⚙ Profile</a>
+                <a href="login.html" onclick="logout()">🚪 Logout</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- TOPBAR HEADER -->
+            <header class="topbar">
+                <div>
+                    <h1>Leave Management</h1>
+                    <p>Manage and process employee leave applications</p>
+                </div>
+
+                <div class="admin-info">
+                    <div class="notification">🔔</div>
+                    <div class="avatar">MT</div>
+                </div>
+            </header>
+
+            <section class="content page-section leave-section">
+
+                <!-- FILTER CARD -->
+                <div class="card filter-card">
+                    <h2>Leave Filters</h2>
+
+                    <div class="filter-grid">
+
+                        <div>
+                            <label for="leaveSearch">Search Employee</label>
+                            <input type="text" id="leaveSearch" placeholder="Search employee..." class="form-control">
+                        </div>
+
+                        <div>
+                            <label for="leaveStatusFilter">Status</label>
+                            <select id="leaveStatusFilter" class="form-control">
+                                <option value="All">All Statuses</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="leaveTypeFilter">Leave Type</label>
+                            <select id="leaveTypeFilter" class="form-control">
+                                <option value="All">All Types</option>
+                                <option value="Casual Leave">Casual Leave</option>
+                                <option value="Sick Leave">Sick Leave</option>
+                                <option value="Emergency Leave">Emergency Leave</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- LEAVE TABLE -->
+                <div class="table-card table-section" style="margin-top: 20px;">
+                    <h2>Leave Requests</h2>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Leave Type</th>
+                                    <th>Reason</th>
+                                    <th>From Date</th>
+                                    <th>To Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaveTableBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">Loading leave applications...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin-leaves.js"></script>
+    <script src="js/sidebar.js"></script>
 
 </body>
 
