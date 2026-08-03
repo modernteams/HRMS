@@ -12,7 +12,7 @@ let workingTimer = null;
 // LOCATION CHECK ENABLE / DISABLE
 // =======================================
 
-const LOCATION_CHECK_ENABLED = false;
+const LOCATION_CHECK_ENABLED = true;
 // true  = GPS mandatory
 // false = Work From Home (GPS bypass)
 
