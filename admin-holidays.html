@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="css/admin-holidays.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Teams - Admin Holiday Management</title>
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <button id="menuToggle" class="menu-toggle">☰</button>
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="assets/logo/mt-logo.jpeg" alt="Logo">
+                <h2>Modern Teams</h2>
+            </div>
+
+            <nav class="menu">
+                <a href="admin.html">🏠 Dashboard</a>
+                <a href="admin-employees.html">👥 Employees</a>
+                <a href="admin-attendance.html">🕒 Attendance</a>
+                <a href="admin-holidays.html" class="active">🎉 Holidays</a>
+                <a href="admin-leaves.html">📄 Leaves</a>
+                <a href="admin-announcements.html">📢 Announcements</a>
+                <a href="admin-profile.html">⚙ Profile</a>
+                <a href="login.html" onclick="logout()">🚪 Logout</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- TOP HEADER -->
+            <header class="topbar">
+                <div class="employee-heading">
+                    <h1>Holiday Management 🎉</h1>
+                    <p>Modern Teams HRMS - Manage Company Holidays</p>
+                </div>
+
+                <div class="employee-info">
+                    <div class="notification-wrapper" onclick="openNotifications()">
+                        <div class="notification">
+                            🔔
+                            <span id="notificationCount" class="notification-badge">0</span>
+                        </div>
+                    </div>
+                    <div class="avatar">MT</div>
+                </div>
+            </header>
+
+            <section class="content dashboard">
+
+                <!-- HOLIDAYS GRID -->
+                <div class="dashboard-grid holiday-grid">
+
+                    <!-- HOLIDAY FORM -->
+                    <div class="card section-card form-card">
+                        <div class="section-header">
+                            <h2>Add New Holiday</h2>
+                        </div>
+
+                        <form id="holidayForm" onsubmit="event.preventDefault();">
+                            <div class="form-group">
+                                <label for="holidayName">Holiday Name *</label>
+                                <input type="text" id="holidayName" class="form-control" placeholder="e.g. Diwali, Independence Day" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="holidayDate">Holiday Date *</label>
+                                <input type="date" id="holidayDate" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="holidayType">Holiday Type</label>
+                                <select id="holidayType" class="form-control">
+                                    <option value="National">National Holiday</option>
+                                    <option value="Festival">Festival</option>
+                                    <option value="Restricted">Restricted Holiday</option>
+                                    <option value="Company">Company Holiday</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="holidayDescription">Description</label>
+                                <textarea id="holidayDescription" class="form-control" placeholder="Optional details..." rows="3"></textarea>
+                            </div>
+
+                            <button id="addHolidayBtn" class="btn btn-dark-submit">+ Add Holiday</button>
+                        </form>
+                    </div>
+
+                    <!-- HOLIDAY TABLE -->
+                    <div class="card section-card table-card">
+                        <div class="section-header">
+                            <h2>Company Holidays List</h2>
+                            <span id="holidayCountBadge">0 Total</span>
+                        </div>
+
+                        <div class="live-table-container">
+                            <table class="live-attendance-table holiday-table">
+                                <thead>
+                                    <tr>
+                                        <th>Holiday</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="holidayTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Loading holidays...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin-holidays.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/notification.js"></script>
+
+    <script>
+        adminGuard();
+    </script>
+</body>
+
+</html>
