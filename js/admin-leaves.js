@@ -1,503 +1,173 @@
 // =================================
-// ADMIN LEAVE MANAGEMENT
+// ADMIN LEAVE MANAGEMENT ENGINE
+// Optimized Queries with Joint Fetch
 // =================================
 
-
 let currentAdmin = null;
-
-
-
-// ================================
-// GET ADMIN PROFILE
-// ================================
-
-async function getAdmin(){
-
-
-const {data:userData} =
-await supabaseClient.auth.getUser();
-
-
-
-if(!userData.user){
-
-window.location.href="login.html";
-return;
-
-}
-
-
-
-const {data:profile,error}=
-
-await supabaseClient
-.from("profiles")
-.select("*")
-.eq(
-"email",
-userData.user.email
-)
-.maybeSingle();
-
-
-
-if(error){
-
-console.log(error);
-return;
-
-}
-
-
-currentAdmin = profile;
-
-
-loadLeaveRequests();
-
-
-}
-
-
-
-
-
+let allLeaves = [];
 
 // ================================
-// LOAD LEAVE REQUESTS
+// GET ADMIN PROFILE & INIT
 // ================================
 
+async function getAdmin() {
+    const { data: userData } = await supabaseClient.auth.getUser();
 
-async function loadLeaveRequests(){
-const {data,error}=
+    if (!userData || !userData.user) {
+        window.location.href = "login.html";
+        return;
+    }
 
-await supabaseClient
-.from("leave_requests")
-.select("*")
-.order(
-"created_at",
-{
-ascending:false
-}
-);
+    const { data: profile, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("email", userData.user.email)
+        .maybeSingle();
 
-if(error){
+    if (error) {
+        console.error("Profile load error:", error);
+        return;
+    }
 
-console.log(error);
-return;
-
-}
-
-
-
-const table =
-document.getElementById(
-"leaveTableBody"
-);
-
-
-
-table.innerHTML="";
-
-
-
-
-
-if(!data || data.length===0){
-
-
-table.innerHTML=`
-
-<tr>
-
-<td colspan="7">
-
-No Leave Requests Found
-
-</td>
-
-</tr>
-
-`;
-
-return;
-
-
+    currentAdmin = profile;
+    loadLeaveRequests();
 }
 
+// ================================
+// LOAD LEAVE REQUESTS (OPTIMIZED)
+// ================================
 
+async function loadLeaveRequests() {
+    const table = document.getElementById("leaveTableBody");
+    if (!table) return;
 
+    // Single Join Query (Eliminates N-1 query issues)
+    const { data, error } = await supabaseClient
+        .from("leave_requests")
+        .select(`
+            *,
+            profiles!employee_id (
+                full_name,
+                department
+            )
+        `)
+        .order("created_at", { ascending: false });
 
-for (const item of data) {
+    if (error) {
+        console.error("Error fetching leaves:", error);
+        table.innerHTML = `<tr><td colspan="7" style="text-align: center;">Failed to load leave requests.</td></tr>`;
+        return;
+    }
 
-
-const {data:employee}=await supabaseClient
-.from("profiles")
-.select("full_name,department")
-.eq(
-"id",
-item.employee_id
-)
-.maybeSingle();
-
-
-
-table.innerHTML += `
-
-<tr>
-<td>
-${employee?.full_name || "-"}
-</td>
-
-<td>
-
-${item.leave_type}
-
-</td>
-
-
-
-<td>
-
-${item.reason}
-
-</td>
-
-
-
-<td>
-
-${item.from_date}
-
-</td>
-
-
-
-<td>
-
-${item.to_date}
-
-</td>
-
-
-
-<td>
-
-<span class="status ${item.status.toLowerCase()}">
-
-${item.status}
-
-</span>
-
-</td>
-
-
-
-<td>
-
-
-
-${
-item.status==="Pending"
-
-?
-
-`
-
-<button 
-class="approve-btn"
-onclick="updateLeave('${item.id}','Approved')">
-
-Approve
-
-</button>
-
-
-<button 
-class="reject-btn"
-onclick="updateLeave('${item.id}','Rejected')">
-
-Reject
-
-</button>
-
-`
-
-:
-
-"-"
-
+    allLeaves = data || [];
+    applyLeaveFilters();
 }
 
+// ================================
+// RENDER LEAVE TABLE
+// ================================
 
+function renderLeaveTable(data) {
+    const table = document.getElementById("leaveTableBody");
+    if (!table) return;
 
-</td>
+    table.innerHTML = "";
 
+    if (!data || data.length === 0) {
+        table.innerHTML = `<tr><td colspan="7" style="text-align: center;">No Leave Requests Found</td></tr>`;
+        return;
+    }
 
-</tr>
+    let rows = "";
+    data.forEach(item => {
+        const statusLower = (item.status || "pending").toLowerCase();
+        const actionCell = item.status === "Pending" ? `
+            <button class="approve-btn btn-sm" onclick="updateLeave('${item.id}', 'Approved')">Approve</button>
+            <button class="reject-btn btn-sm" onclick="updateLeave('${item.id}', 'Rejected')">Reject</button>
+        ` : `-`;
 
+        rows += `
+        <tr>
+            <td><strong>${item.profiles?.full_name || "Unknown"}</strong></td>
+            <td>${item.leave_type || "General"}</td>
+            <td>${item.reason || "-"}</td>
+            <td>${item.from_date || "-"}</td>
+            <td>${item.to_date || "-"}</td>
+            <td><span class="status-badge status-${statusLower}">${item.status}</span></td>
+            <td>${actionCell}</td>
+        </tr>
+        `;
+    });
 
-
-`;
-
-
-
-};
-
-
-
-
-
+    table.innerHTML = rows;
 }
-
-
-
-
-
-
-
-
 
 // ================================
 // UPDATE STATUS
 // ================================
 
+async function updateLeave(id, status) {
+    if (!currentAdmin) {
+        alert("Admin profile not loaded!");
+        return;
+    }
 
-async function updateLeave(id,status){
+    if (!confirm(`Are you sure you want to mark this request as ${status}?`)) return;
 
+    const { error } = await supabaseClient
+        .from("leave_requests")
+        .update({
+            status: status,
+            approved_by: currentAdmin.id
+        })
+        .eq("id", id);
 
+    if (error) {
+        alert("Update Error: " + error.message);
+        return;
+    }
 
-if(!currentAdmin){
-
-alert("Admin not loaded");
-
-return;
-
+    alert(`Leave request ${status.toLowerCase()} successfully.`);
+    loadLeaveRequests();
 }
-
-
-
-
-
-const {error}=
-
-await supabaseClient
-.from("leave_requests")
-.update({
-
-status:status,
-
-approved_by:
-currentAdmin.id
-
-})
-.eq(
-"id",
-id
-);
-
-
-
-
-
-if(error){
-
-alert(error.message);
-
-return;
-
-}
-
-
-
-
-
-alert(
-"Leave "+status+" Successfully"
-);
-
-
-
-loadLeaveRequests();
-
-
-
-}
-
-
-
-
-
-
-
-
 
 // ================================
-// FILTER STATUS
+// FILTERS
 // ================================
 
+function applyLeaveFilters() {
+    const statusVal = document.getElementById("leaveStatusFilter")?.value || "All";
+    const typeVal = document.getElementById("leaveTypeFilter")?.value || "All";
+    const searchVal = (document.getElementById("leaveSearch")?.value || "").toLowerCase().trim();
 
-document
-.getElementById("leaveStatusFilter")
-.addEventListener(
-"change",
-function(){
+    let filtered = [...allLeaves];
 
+    if (statusVal !== "All") {
+        filtered = filtered.filter(item => item.status === statusVal);
+    }
 
-filterLeaves();
+    if (typeVal !== "All") {
+        filtered = filtered.filter(item => item.leave_type === typeVal);
+    }
 
+    if (searchVal) {
+        filtered = filtered.filter(item =>
+            (item.profiles?.full_name || "").toLowerCase().includes(searchVal)
+        );
+    }
 
+    renderLeaveTable(filtered);
+}
+
+// Event Listeners for Filters
+document.addEventListener("DOMContentLoaded", () => {
+    const statusFilter = document.getElementById("leaveStatusFilter");
+    const typeFilter = document.getElementById("leaveTypeFilter");
+    const searchInput = document.getElementById("leaveSearch");
+
+    if (statusFilter) statusFilter.addEventListener("change", applyLeaveFilters);
+    if (typeFilter) typeFilter.addEventListener("change", applyLeaveFilters);
+    if (searchInput) searchInput.addEventListener("input", applyLeaveFilters);
+
+    getAdmin();
 });
-
-
-
-
-
-async function filterLeaves(){
-
-
-const status =
-document.getElementById(
-"leaveStatusFilter"
-).value;
-
-
-
-let query = supabaseClient
-.from("leave_requests")
-.select("*")
-.order(
-"created_at",
-{
-ascending:false
-}
-);
-
-
-
-if(status !== "All"){
-
-
-query =
-query.eq(
-"status",
-status
-);
-
-
-}
-
-
-
-const {data,error}=await query;
-
-
-
-if(error){
-
-console.log(error);
-return;
-
-}
-
-
-
-const table =
-document.getElementById(
-"leaveTableBody"
-);
-
-
-table.innerHTML="";
-
-
-
-for(const item of data){
-
-
-const {data:employee}=await supabaseClient
-.from("profiles")
-.select("full_name")
-.eq(
-"id",
-item.employee_id
-)
-.maybeSingle();
-
-
-
-
-table.innerHTML += `
-
-<tr>
-
-<td>
-${employee?.full_name || "-"}
-</td>
-
-
-<td>
-${item.leave_type}
-</td>
-
-
-<td>
-${item.reason}
-</td>
-
-
-<td>
-${item.from_date}
-</td>
-
-
-<td>
-${item.to_date}
-</td>
-
-
-<td>
-${item.status}
-</td>
-
-
-<td>
-
-${
-item.status==="Pending"
-
-?
-
-`
-
-<button onclick="updateLeave('${item.id}','Approved')">
-Approve
-</button>
-
-
-<button onclick="updateLeave('${item.id}','Rejected')">
-Reject
-</button>
-
-`
-
-:
-
-"-"
-
-}
-
-</td>
-
-</tr>
-
-`;
-
-
-
-}
-
-
-
-}
-
-getAdmin();
