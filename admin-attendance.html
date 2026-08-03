@@ -1,408 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
-<link rel="stylesheet" href="css/variables.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/admin-attendance.css">
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<title>
-Modern Teams - Attendance
-</title>
-
-
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin-attendance.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Teams - Attendance</title>
 </head>
-
-
 
 <body>
 
-
-
-<div class="app-layout">
-
-
-
-
-
-<!-- ======================
-     SIDEBAR
-====================== -->
-
-<button id="menuToggle" class="menu-toggle">
-☰
-</button>
-
-
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-
-<aside class="sidebar">
-
-
-
-<div class="logo">
-
-<img src="assets/logo/mt-logo.jpeg" alt="Logo">
-
-
-<h2>
-Modern Teams
-</h2>
-
-
-</div>
-
-
-
-
-<nav class="menu">
-
-
-<a href="admin.html">
-🏠 Dashboard
-</a>
-
-
-
-<a href="admin-employees.html">
-👥 Employees
-</a>
-
-
-
-
-<a class="active" href="admin-attendance.html">
-🕒 Attendance
-</a>
-
-
-
-
-<a href="admin-leaves.html">
-📄 Leaves
-</a>
-
-
-
-
-<a href="admin-announcements.html">
-📢 Announcements
-</a>
-
-
-
-
-<a href="admin-profile.html">
-⚙ Profile
-</a>
-
-
-
-
-<a href="login.html" onclick="logout()">
-🚪 Logout
-</a>
-
-
-
-</nav>
-
-
-</aside>
-
-
-<!-- ======================
-     MAIN CONTENT
-====================== -->
-
-
-<main class="main-content">
-
-
-
-
-
-<header class="topbar">
-
-
-<div>
-
-
-<h1>
-Attendance
-</h1>
-
-
-<p>
-Track employee attendance
-</p>
-
-
-</div>
-
-
-
-
-<div class="admin-info">
-
-
-<div class="notification">
-🔔
-</div>
-
-
-
-<div class="avatar">
-MT
-</div>
-
-
-
-</div>
-
-
-
-</header>
-
-<section class="content attendance-section">
-
-<!-- FILTER AREA -->
-
-<div class="filter-grid">
-
-
-<div>
-
-<label>
-Select Date
-</label>
-
-<input 
-type="date"
-id="attendanceDate">
-
-</div>
-
-
-<div>
-
-<label>
-Search Employee
-</label>
-
-<input 
-type="text"
-id="attendanceSearch"
-placeholder="Employee name">
-
-</div>
-
-
-<div>
-
-<label>
-Department
-</label>
-
-
-<select id="attendanceDepartment">
-
-<option value="">
-All Departments
-</option>
-
-<option value="IT">
-IT
-</option>
-
-<option value="HR">
-HR
-</option>
-
-<option value="Marketing">
-Marketing
-</option>
-
-<option value="Finance">
-Finance
-</option>
-
-
-</select>
-
-
-</div>
-
-
-
-
-<div>
-
-<label>
-Status
-</label>
-
-
-<select id="attendanceStatus">
-
-
-<option value="">
-All Status
-</option>
-
-
-<option value="Present">
-Present
-</option>
-
-
-<option value="Absent">
-Absent
-</option>
-
-
-</select>
-
-
-</div>
-
-
-
-
-</div>
-
-<div>
-
-<label>
-
-</label>
-
-<button id="attendanceSearchBtn" class="btn btn-primary">
-Search
-</button>
-
-</div>
-
-
-<!-- ATTENDANCE TABLE -->
-
-
-
-<div class="table-card table-section">
-
-
-
-<h2>
-Employee Attendance
-</h2>
-
-
-
-<table>
-
-
-<thead>
-
-
-<tr>
-
-
-<th>
-Employee
-</th>
-
-
-<th>
-Date
-</th>
-
-
-<th>
-Check In
-</th>
-
-
-<th>
-Check Out
-</th>
-
-
-<th>
-Working Hours
-</th>
-
-
-<th>
-Break Time
-</th>
-
-
-<th>
-Activity
-</th>
-
-
-<th>
-Status
-</th>
-
-
-</tr>
-
-
-</thead>
-
-
-
-<tbody id="attendanceTableBody">
-
-
-<tr>
-
-<td colspan="8">
-
-No Attendance Found
-
-</td>
-
-</tr>
-
-
-</tbody>
-
-
-</table>
-</div>
-
-
-</section>
-
-</main>
-
-</div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="js/supabase.js"></script>
-
-<script src="js/auth.js"></script>
-
-<script src="js/admin-attendance.js"></script>
-
-<script src="js/sidebar.js"></script>
-
+    <div class="app-layout">
+
+        <!-- SIDEBAR TOGGLE -->
+        <button id="menuToggle" class="menu-toggle">☰</button>
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="assets/logo/mt-logo.jpeg" alt="Logo">
+                <h2>Modern Teams</h2>
+            </div>
+
+            <nav class="menu">
+                <a href="admin.html">🏠 Dashboard</a>
+                <a href="admin-employees.html">👥 Employees</a>
+                <a class="active" href="admin-attendance.html">🕒 Attendance</a>
+                <a href="admin-leaves.html">📄 Leaves</a>
+                <a href="admin-announcements.html">📢 Announcements</a>
+                <a href="admin-holidays.html">🎉 Holidays</a>
+                <a href="admin-profile.html">⚙ Profile</a>
+                <a href="login.html" onclick="logout()">🚪 Logout</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- TOPBAR HEADER -->
+            <header class="topbar">
+                <div>
+                    <h1>Attendance</h1>
+                    <p>Track employee attendance and daily work hours</p>
+                </div>
+
+                <div class="admin-info">
+                    <div class="notification">🔔</div>
+                    <div class="avatar">MT</div>
+                </div>
+            </header>
+
+            <section class="content attendance-section">
+
+                <!-- FILTER AREA -->
+                <div class="card filter-card">
+                    <div class="filter-grid">
+
+                        <div>
+                            <label for="attendanceDate">Select Date</label>
+                            <input type="date" id="attendanceDate" class="form-control">
+                        </div>
+
+                        <div>
+                            <label for="attendanceSearch">Search Employee</label>
+                            <input type="text" id="attendanceSearch" placeholder="Employee name" class="form-control">
+                        </div>
+
+                        <div>
+                            <label for="attendanceDepartment">Department</label>
+                            <select id="attendanceDepartment" class="form-control">
+                                <option value="">All Departments</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Tech">Tech</option>
+                                <option value="Creative Team">Creative Team</option>
+                                <option value="Operation">Operation</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="attendanceStatus">Status</label>
+                            <select id="attendanceStatus" class="form-control">
+                                <option value="">All Status</option>
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                                <option value="Late">Late</option>
+                                <option value="On Leave">On Leave</option>
+                                <option value="Holiday">Holiday</option>
+                                <option value="Week Off">Week Off</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="filter-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button id="attendanceSearchBtn" class="btn btn-primary">Search</button>
+                        <button id="resetAttendanceBtn" class="btn btn-secondary">Reset</button>
+                    </div>
+                </div>
+
+                <!-- ATTENDANCE TABLE -->
+                <div class="table-card table-section" style="margin-top: 20px;">
+                    <h2>Employee Attendance Logs</h2>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Date</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Working Hours</th>
+                                    <th>Break Time</th>
+                                    <th>Activity</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center;">Loading attendance data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin-attendance.js"></script>
+    <script src="js/sidebar.js"></script>
 
 </body>
-
 
 </html>
