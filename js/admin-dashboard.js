@@ -1,6 +1,6 @@
 // ======================================
 // MODERN TEAMS HRMS
-// ADMIN DASHBOARD JS (SAFE FIXED VERSION)
+// ADMIN DASHBOARD JS (SAFE & FULLY UPDATED)
 // ======================================
 
 let currentAdmin = null;
@@ -201,75 +201,100 @@ async function loadAttendanceChart() {
 
 loadAttendanceChart();
 
-// LIVE ATTENDANCE MONITOR (SAFE VERSION)
+// LIVE ATTENDANCE MONITOR (UPDATED: SHOWS ALL EMPLOYEES INCLUDING ABSENTEES)
 async function loadLiveAttendance() {
   const today = new Date().toLocaleDateString("en-CA");
   const table = document.getElementById("liveAttendanceTable");
   if (!table) return;
 
   try {
+    // 1. Fetch All Employee Profiles
+    const { data: employees, error: empError } = await supabaseClient
+      .from("profiles")
+      .select("id, full_name, department")
+      .eq("role", "employee")
+      .order("full_name", { ascending: true });
+
+    if (empError || !employees || employees.length === 0) {
+      table.innerHTML = `<tr><td colspan="4">No employees found.</td></tr>`;
+      return;
+    }
+
+    // 2. Fetch Today's Attendance Logs
     const { data: attendanceData, error: attendanceError } = await supabaseClient
       .from("attendance")
       .select("*")
       .eq("attendance_date", today);
 
-    if (attendanceError) return;
-
-    const { data: profiles } = await supabaseClient
-      .from("profiles")
-      .select("id, full_name");
-
-    const profileMap = {};
-    if (profiles) {
-      profiles.forEach(p => profileMap[p.id] = p.full_name);
+    // Map logs for easy access
+    const attendanceMap = {};
+    if (attendanceData && !attendanceError) {
+      attendanceData.forEach((item) => {
+        const userId = item.user_id || item.employee_id;
+        if (userId) {
+          attendanceMap[userId] = item;
+        }
+      });
     }
 
+    // 3. Render Table Rows for ALL Employees
     table.innerHTML = "";
 
-    if (!attendanceData || attendanceData.length === 0) {
-      table.innerHTML = `<tr><td colspan="4">No attendance today</td></tr>`;
-      return;
-    }
+    employees.forEach((emp) => {
+      const item = attendanceMap[emp.id];
 
-    attendanceData.forEach((item) => {
-      const empName = profileMap[item.user_id || item.employee_id] || "Employee";
-      const isOnBreak = 
-        item.break_status === true || 
-        item.break_status === "true" || 
-        item.is_on_break === true || 
-        item.status === "Break" || 
-        item.status === "On Break";
+      let status = "<span style='color: #dc2626; font-weight: 600;'>🔴 Absent</span>";
+      let checkInTime = "--";
+      let checkOutTime = "--";
 
-      let status = "🟢 Working";
-      if (item.check_out) status = "🔴 Checked Out";
-      else if (isOnBreak) status = "🟡 On Break";
+      if (item) {
+        const isOnBreak = 
+          item.break_status === true || 
+          item.break_status === "true" || 
+          item.is_on_break === true || 
+          item.status === "Break" || 
+          item.status === "On Break";
 
-      const checkInTime = item.check_in
-        ? new Date(item.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : "--";
+        if (item.check_out) {
+          status = "<span style='color: #4b5563; font-weight: 600;'>🔴 Checked Out</span>";
+        } else if (isOnBreak) {
+          status = "<span style='color: #d97706; font-weight: 600;'>🟡 On Break</span>";
+        } else if (item.check_in) {
+          status = "<span style='color: #16a34a; font-weight: 600;'>🟢 Working</span>";
+        }
 
-      const checkOutTime = item.check_out
-        ? new Date(item.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : "...";
+        checkInTime = item.check_in
+          ? new Date(item.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          : "--";
+
+        checkOutTime = item.check_out
+          ? new Date(item.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          : "...";
+      }
 
       table.innerHTML += `
         <tr>
-          <td>${empName}</td>
+          <td>
+            <strong>${emp.full_name || "Employee"}</strong>
+            <div style="font-size: 11px; color: #64748b;">${emp.department || "General"}</div>
+          </td>
           <td>${checkInTime}</td>
           <td>${checkOutTime}</td>
           <td>${status}</td>
         </tr>
       `;
     });
+
   } catch (e) {
     console.error("Live attendance error:", e);
+    table.innerHTML = `<tr><td colspan="4">Error loading attendance logs.</td></tr>`;
   }
 }
 
 loadLiveAttendance();
 setInterval(loadLiveAttendance, 30000);
 
-// RECENT ACTIVITIES (FIXED ANNOUNCEMENTS AND RELATIONAL ERRORS)
+// RECENT ACTIVITIES
 async function loadRecentActivities() {
   const container = document.getElementById("recentActivity");
   const timeSpan = document.getElementById("lastUpdatedTime");
@@ -426,7 +451,7 @@ function setupRealtimeActivities() {
 }
 
 setupRealtimeActivities();
-// Add this at the bottom of admin-dashboard.js
+
 async function refreshActivityManual() {
   const btn = document.getElementById('refreshActivityBtn');
   if (btn) btn.innerText = '🔄 Refreshing...';
