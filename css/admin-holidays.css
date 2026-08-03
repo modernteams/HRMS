@@ -1,0 +1,146 @@
+/* =====================================
+   MODERN TEAMS HRMS
+   ADMIN HOLIDAYS MODULE STYLES
+   MATCHING DASHBOARD DESIGN SYSTEM
+===================================== */
+
+/* GRID LAYOUT */
+.holiday-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+/* FORM STYLING */
+.form-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 14px;
+  color: #111;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #111;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.05);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+.btn-dark-submit {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  background: #111;
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 6px;
+}
+
+.btn-dark-submit:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+/* TABLE OVERRIDES */
+.holiday-table th {
+  background: #111;
+  color: #fff;
+  padding: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.holiday-table td {
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.holiday-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+/* ACTION BUTTONS */
+.btn-action-sm {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+  margin-right: 4px;
+}
+
+.btn-action-edit {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-action-edit:hover {
+  background: #e2e8f0;
+}
+
+.btn-action-delete {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.btn-action-delete:hover {
+  background: #fee2e2;
+}
+
+.text-center {
+  text-align: center;
+  color: #64748b;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .holiday-grid {
+    grid-template-columns: 1fr;
+  }
+}
