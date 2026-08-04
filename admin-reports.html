@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin-reports.css">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Modern Teams - Reports
+    </title>
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+
+<!-- ==========================
+        SIDEBAR
+========================== -->
+
+<button id="menuToggle" class="menu-toggle">
+    ☰
+</button>
+
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+
+
+<aside class="sidebar">
+
+
+<div class="logo">
+
+<img src="assets/logo/mt-logo.jpeg" alt="Logo">
+
+<h2>
+Modern Teams
+</h2>
+
+</div>
+
+
+
+
+<nav class="menu">
+
+
+<a href="admin.html">
+🏠 Dashboard
+</a>
+
+
+<a href="admin-employees.html">
+👥 Employees
+</a>
+
+
+<a href="admin-attendance.html">
+🕒 Attendance
+</a>
+
+
+<a href="admin-reports.html" class="active">
+📊 Reports
+</a>
+
+
+<a href="admin-leaves.html">
+📄 Leaves
+</a>
+
+
+<a href="admin-announcements.html">
+📢 Announcements
+</a>
+
+
+<a href="admin-holidays.html">
+🎉 Holidays
+</a>
+
+
+<a href="admin-profile.html">
+⚙ Profile
+</a>
+
+
+
+<a href="login.html" onclick="logout()">
+🚪 Logout
+</a>
+
+
+
+</nav>
+
+
+</aside>
+
+
+
+
+
+
+<!-- ==========================
+        MAIN CONTENT
+========================== -->
+
+
+<main class="main-content">
+
+
+
+<header class="topbar">
+
+
+<div>
+
+
+<h1>
+Reports
+</h1>
+
+
+<p>
+Attendance & Employee Analytics
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="admin-info">
+
+
+<div class="notification">
+🔔
+</div>
+
+
+<div class="avatar">
+MT
+</div>
+
+
+</div>
+
+
+</header>
+
+
+
+
+
+
+
+
+<section class="content report-section">
+
+
+
+
+
+<!-- ==========================
+        FILTER CARD
+========================== -->
+
+
+<div class="card filter-card">
+
+
+<h2>
+Generate Report
+</h2>
+
+
+
+<div class="filter-grid">
+
+
+
+<div>
+
+<label>
+From Date
+</label>
+
+<input 
+type="date"
+id="reportFromDate"
+class="form-control">
+
+</div>
+
+
+
+
+<div>
+
+<label>
+To Date
+</label>
+
+<input 
+type="date"
+id="reportToDate"
+class="form-control">
+
+</div>
+
+
+
+
+
+
+<div>
+
+<label>
+Department
+</label>
+
+
+<select 
+id="reportDepartment"
+class="form-control">
+
+
+<option value="">
+All Departments
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+<div>
+
+<label>
+Employee
+</label>
+
+
+<select 
+id="reportEmployee"
+class="form-control">
+
+
+<option value="">
+All Employees
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+<div>
+
+<label>
+Report Type
+</label>
+
+
+<select 
+id="reportType"
+class="form-control">
+
+
+<option value="attendance">
+Attendance Summary
+</option>
+
+
+<option value="daily">
+Daily Attendance
+</option>
+
+
+<option value="monthly">
+Monthly Attendance
+</option>
+
+
+<option value="leave">
+Leave Report
+</option>
+
+
+<option value="late">
+Late Report
+</option>
+
+
+
+</select>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<div class="report-actions">
+
+
+<button 
+id="generateReportBtn"
+class="btn btn-primary">
+
+Generate Report
+
+</button>
+
+
+
+<button 
+id="resetReportBtn"
+class="btn btn-secondary">
+
+Reset
+
+</button>
+
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- ==========================
+        EXPORT AREA
+========================== -->
+
+
+<div class="export-card">
+
+
+<h3>
+Export Report
+</h3>
+
+
+<div>
+
+
+<button 
+class="btn btn-dark"
+id="exportExcelBtn">
+
+📥 Excel
+
+</button>
+
+
+
+<button 
+class="btn btn-dark"
+id="exportPdfBtn">
+
+📄 PDF
+
+</button>
+
+
+
+<button 
+class="btn btn-dark"
+id="printReportBtn">
+
+🖨 Print
+
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- ==========================
+        REPORT TABLE
+========================== -->
+
+
+
+<div class="table-card table-section">
+
+
+
+<h2>
+Attendance Report
+</h2>
+
+
+
+
+<div class="table-responsive">
+
+
+<table>
+
+<thead>
+
+
+<tr>
+
+
+<th>
+Employee
+</th>
+
+
+
+<th>
+Department
+</th>
+
+
+
+<th>
+Total Days
+</th>
+
+
+
+<th>
+Present
+</th>
+
+
+
+<th>
+Late
+</th>
+
+
+
+<th>
+Absent
+</th>
+
+
+
+<th>
+Leave
+</th>
+
+
+
+<th>
+Working Hours
+</th>
+
+
+
+<th>
+Attendance %
+</th>
+
+
+</tr>
+
+
+</thead>
+<tbody id="reportTableBody">
+
+
+<tr>
+
+<td colspan="9" style="text-align:center">
+
+Generate report to view data
+
+</td>
+
+</tr>
+
+
+</tbody>
+
+</table>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+</section>
+
+
+
+</main>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- ==========================
+        SCRIPTS
+========================== -->
+<<!-- Export Libraries -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+
+<!-- Supabase -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
+
+<!-- Auth -->
+
+<script src="js/auth.js"></script>
+
+
+<!-- Reports Logic -->
+
+<script src="js/admin-reports.js"></script>
+
+
+<!-- Sidebar -->
+
+<script src="js/sidebar.js"></script>
+
+</body>
+
+
+</html>
