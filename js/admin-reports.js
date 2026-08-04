@@ -1,24 +1,73 @@
-// =======================================
+// =====================================================
 // MODERN TEAMS HRMS
-// ADMIN REPORT MODULE
-// EMPLOYEE SUMMARY REPORT ENGINE
-// =======================================
+// ADMIN REPORT ENGINE
+// Employee Wise Attendance Summary
+// =====================================================
 
 
 let reportData = [];
 
+let holidaysData = [];
 
 
 
-// =======================================
-// DATE HELPER
-// =======================================
+// =====================================================
+// DATE HELPERS
+// =====================================================
 
-function getTodayDate(){
 
-    let d = new Date();
+function formatDate(date){
 
-    return d.toISOString().split("T")[0];
+    return date
+    .toISOString()
+    .split("T")[0];
+
+}
+
+
+
+function getWorkingDays(from,to,holidays){
+
+
+    let days=[];
+
+
+    let start=new Date(from);
+
+    let end=new Date(to);
+
+
+
+    while(start<=end){
+
+
+        let date=formatDate(start);
+
+
+        let day=start.getDay();
+
+
+
+        // Sunday remove
+
+        if(day!==0 && 
+        !holidays.includes(date)){
+
+
+            days.push(date);
+
+        }
+
+
+        start.setDate(
+            start.getDate()+1
+        );
+
+
+    }
+
+
+    return days;
 
 }
 
@@ -26,15 +75,13 @@ function getTodayDate(){
 
 
 
-// =======================================
-// GENERATE REPORT
-// =======================================
+// =====================================================
+// LOAD REPORT
+// =====================================================
 
 
 async function generateReport(){
 
-
-try{
 
 
 let fromDate =
@@ -51,25 +98,16 @@ document.getElementById(
 
 
 
-let department =
-document.getElementById(
-"reportDepartment"
-).value;
+if(!fromDate || !toDate){
 
 
+alert(
+"Please select date range"
+);
 
 
+return;
 
-if(!fromDate){
-
-fromDate = getTodayDate();
-
-}
-
-
-if(!toDate){
-
-toDate = getTodayDate();
 
 }
 
@@ -77,30 +115,77 @@ toDate = getTodayDate();
 
 
 
-// ===================================
-// GET EMPLOYEES
-// ===================================
+// =============================
+// HOLIDAYS
+// =============================
 
 
 const {
 
-data:employees,
-error:empError
+data:holidays
+
+}=await supabaseClient
+
+
+.from("holidays")
+
+.select(
+"holiday_date"
+);
+
+
+
+holidaysData =
+(holidays || [])
+.map(h=>h.holiday_date);
+
+
+
+
+
+// =============================
+// WORKING DAYS
+// =============================
+
+
+let workingDays =
+getWorkingDays(
+fromDate,
+toDate,
+holidaysData
+);
+
+
+
+console.log(
+"Working Days",
+workingDays
+);
+
+
+
+
+
+
+// =============================
+// EMPLOYEES
+// =============================
+
+
+const {
+
+data:employees
 
 }=await supabaseClient
 
 
 .from("profiles")
 
-
 .select(`
-
 id,
 full_name,
 department,
-role,
-status
-
+role
 `)
 
 
@@ -113,28 +198,14 @@ status
 
 
 
-if(empError){
-
-console.log(empError);
-
-return;
-
-}
-
-
-
-
-
-
-// ===================================
-// GET ATTENDANCE
-// ===================================
+// =============================
+// ATTENDANCE
+// =============================
 
 
 const {
 
-data:attendance,
-error:attError
+data:attendance
 
 }=await supabaseClient
 
@@ -160,22 +231,11 @@ toDate
 
 
 
-if(attError){
-
-console.log(attError);
-
-return;
-
-}
 
 
-
-
-
-
-// ===================================
-// GET LEAVES
-// ===================================
+// =============================
+// LEAVES
+// =============================
 
 
 const {
@@ -200,11 +260,29 @@ data:leaves
 
 
 
+buildEmployeeReport(
+employees || [],
+attendance || [],
+leaves || [],
+workingDays
+);
 
 
-// ===================================
-// PROCESS EMPLOYEE SUMMARY
-// ===================================
+
+}
+
+
+// =====================================================
+// BUILD EMPLOYEE REPORT
+// =====================================================
+
+
+function buildEmployeeReport(
+employees,
+attendance,
+leaves,
+workingDays
+){
 
 
 
@@ -212,40 +290,7 @@ reportData=[];
 
 
 
-
 employees.forEach(emp=>{
-
-
-
-if(
-department &&
-emp.department!==department
-){
-
-return;
-
-}
-
-
-
-
-
-let empAttendance =
-
-attendance.filter(a=>
-
-
-String(a.employee_id)
-
-===
-
-String(emp.id)
-
-
-);
-
-
-
 
 
 
@@ -257,37 +302,95 @@ let absent=0;
 
 let leave=0;
 
-let workingMinutes=0;
+
+
+let totalWorkingDays =
+workingDays.length;
 
 
 
 
 
-
-// ----------------------------
-// COUNT ATTENDANCE
-// ----------------------------
-
-
-empAttendance.forEach(att=>{
-
-
-let status =
-calculateAttendanceStatus(att);
+workingDays.forEach(date=>{
 
 
 
-if(status==="Present"){
+// =========================
+// ATTENDANCE FIND
+// =========================
 
-present++;
+
+let att =
+attendance.find(a=>
+
+String(a.employee_id)
+===
+String(emp.id)
+
+&&
+
+a.attendance_date===date
+
+);
+
+
+
+
+// =========================
+// LEAVE CHECK
+// =========================
+
+
+let isLeave =
+leaves.some(l=>
+
+String(l.employee_id)
+===
+String(emp.id)
+
+&&
+
+date >= l.from_date
+
+&&
+
+date <= l.to_date
+
+);
+
+
+
+
+
+// =========================
+// STATUS CALCULATION
+// =========================
+
+
+
+if(isLeave){
+
+
+leave++;
+
+
+return;
+
 
 }
 
 
 
-if(status==="Late"){
 
-late++;
+
+if(!att){
+
+
+absent++;
+
+
+return;
+
 
 }
 
@@ -295,33 +398,46 @@ late++;
 
 
 
-if(att.check_in){
-
-
-let start =
+let checkIn =
 new Date(
 att.check_in
 );
 
 
-let end =
-att.check_out
-?
-new Date(att.check_out)
-:
-new Date();
+
+
+let officeTime =
+new Date(date);
 
 
 
-workingMinutes +=
-
-Math.floor(
-(end-start)/60000
+officeTime.setHours(
+10,
+15,
+0
 );
+
+
+
+
+
+if(checkIn > officeTime){
+
+
+late++;
+
+present++;
 
 
 }
 
+else{
+
+
+present++;
+
+
+}
 
 
 
@@ -333,93 +449,23 @@ Math.floor(
 
 
 
-
-// ----------------------------
-// COUNT LEAVE
-// ----------------------------
+let percentage=0;
 
 
 
-let empLeaves =
+if(totalWorkingDays>0){
 
-leaves.filter(l=>
 
-String(l.employee_id)
-
-===
-
-String(emp.id)
-
+percentage =
+Math.round(
+(present / totalWorkingDays)
+*
+100
 );
 
-
-
-leave = calculateLeaveDays(
-empLeaves,
-fromDate,
-toDate
-);
-
-
-
-
-
-
-// ----------------------------
-// TOTAL DAYS
-// ----------------------------
-
-
-let totalDays =
-
-calculateDays(
-fromDate,
-toDate
-);
-
-
-
-
-
-absent =
-
-totalDays -
-
-present -
-
-late -
-
-leave;
-
-
-
-if(absent < 0){
-
-absent=0;
 
 }
 
-
-
-
-
-
-let percentage =
-
-totalDays>0
-
-?
-
-Math.round(
-((present+late)
-/totalDays)
-*
-100
-)
-
-:
-
-0;
 
 
 
@@ -429,33 +475,25 @@ Math.round(
 reportData.push({
 
 
-
 employee:emp,
 
 
-totalDays,
+totalDays:totalWorkingDays,
 
 
-present,
+present:present,
 
 
-late,
+late:late,
 
 
-absent,
+absent:absent,
 
 
-leave,
+leave:leave,
 
 
-percentage,
-
-
-workingHours:
-
-convertMinutes(
-workingMinutes
-)
+percentage:percentage
 
 
 
@@ -463,12 +501,7 @@ workingMinutes
 
 
 
-
-
 });
-
-
-
 
 
 
@@ -481,6 +514,11 @@ reportData
 
 
 
+calculateSummary(
+reportData
+);
+
+
 
 renderReport(
 reportData
@@ -490,202 +528,57 @@ reportData
 
 }
 
-catch(error){
 
 
-console.log(
-"REPORT ERROR",
-error
-);
 
 
-}
+// =====================================================
+// SUMMARY CARDS
+// =====================================================
 
 
+function calculateSummary(data){
 
-}
 
 
+// Reports me total employees
+// duplicate nahi hoga
 
 
+document.getElementById(
+"totalEmployees"
+).innerText =
+data.length;
 
 
 
+// Ye dashboard ke liye nahi
+// isliye total count nahi
 
 
-// =======================================
-// STATUS
-// =======================================
+let totalPresent=0;
 
+let totalAbsent=0;
 
-function calculateAttendanceStatus(att){
+let totalLate=0;
 
+let totalLeave=0;
 
 
-if(!att.check_in){
 
-return "Absent";
+data.forEach(item=>{
 
-}
 
+totalPresent += item.present;
 
 
+totalAbsent += item.absent;
 
-let check =
-new Date(
-att.check_in
-);
 
+totalLate += item.late;
 
 
-let office =
-new Date(
-att.attendance_date
-);
-
-
-
-office.setHours(
-10,
-15,
-0
-);
-
-
-
-
-
-if(check > office){
-
-return "Late";
-
-}
-
-
-
-return "Present";
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =======================================
-// DAYS CALCULATOR
-// =======================================
-
-
-function calculateDays(
-start,
-end
-){
-
-
-
-let s =
-new Date(start);
-
-
-let e =
-new Date(end);
-
-
-
-let diff =
-e-s;
-
-
-
-return (
-
-Math.floor(
-diff/(1000*60*60*24)
-)
-
-+1
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =======================================
-// LEAVE DAYS
-// =======================================
-
-
-function calculateLeaveDays(
-leaves,
-from,
-to
-){
-
-
-
-let count=0;
-
-
-
-leaves.forEach(l=>{
-
-
-let start =
-new Date(
-l.from_date
-);
-
-
-let end =
-new Date(
-l.to_date
-);
-
-
-
-while(start<=end){
-
-
-let day =
-start.toISOString()
-.split("T")[0];
-
-
-
-if(
-day>=from &&
-day<=to
-){
-
-count++;
-
-}
-
-
-
-start.setDate(
-start.getDate()+1
-);
-
-
-
-}
-
+totalLeave += item.leave;
 
 
 });
@@ -693,7 +586,31 @@ start.getDate()+1
 
 
 
-return count;
+document.getElementById(
+"presentCount"
+).innerText =
+totalPresent;
+
+
+
+document.getElementById(
+"absentCount"
+).innerText =
+totalAbsent;
+
+
+
+document.getElementById(
+"lateCount"
+).innerText =
+totalLate;
+
+
+
+document.getElementById(
+"leaveCount"
+).innerText =
+totalLeave;
 
 
 
@@ -705,52 +622,19 @@ return count;
 
 
 
-
-
-// =======================================
-// MINUTES TO HOURS
-// =======================================
-
-
-function convertMinutes(min){
-
-
-
-let h =
-Math.floor(
-min/60
-);
-
-
-
-let m =
-min%60;
-
-
-
-return `${h}h ${m}m`;
-
-}
-
-// =======================================
-// RENDER EMPLOYEE SUMMARY REPORT
-// =======================================
+// =====================================================
+// TABLE RENDER
+// =====================================================
 
 
 function renderReport(data){
 
 
-const table =
 
+let table =
 document.getElementById(
 "reportTableBody"
 );
-
-
-
-if(!table)
-return;
-
 
 
 
@@ -762,9 +646,9 @@ table.innerHTML=`
 
 <tr>
 
-<td colspan="9">
+<td colspan="8">
 
-No Report Data Found
+No Report Found
 
 </td>
 
@@ -792,8 +676,7 @@ data.forEach(item=>{
 
 
 
-html += `
-
+html+=`
 
 <tr>
 
@@ -816,23 +699,11 @@ ${item.employee.department || "-"}
 
 
 
-
-<td>
-
-${item.totalDays}
-
-</td>
-
-
-
-
-
 <td>
 
 ${item.present}
 
 </td>
-
 
 
 
@@ -844,6 +715,13 @@ ${item.late}
 
 
 
+<td>
+
+${item.leave}
+
+</td>
+
+
 
 <td>
 
@@ -853,24 +731,11 @@ ${item.absent}
 
 
 
-
 <td>
 
-${item.leave}
+${item.totalDays}
 
 </td>
-
-
-
-
-
-<td>
-
-${item.workingHours}
-
-</td>
-
-
 
 
 
@@ -882,10 +747,7 @@ ${item.percentage}%
 
 
 
-
 </tr>
-
-
 
 `;
 
@@ -896,43 +758,16 @@ ${item.percentage}%
 
 
 
+
 table.innerHTML=html;
 
 
 
-
-// update unique employee card
-
-let total =
-
-document.getElementById(
-"totalEmployees"
-);
-
-
-
-if(total){
-
-total.innerText =
-data.length;
-
 }
 
-
-
-}
-
-
-
-
-
-
-
-
-
-// =======================================
+// =====================================================
 // EXCEL EXPORT
-// =======================================
+// =====================================================
 
 
 function exportExcel(){
@@ -954,96 +789,66 @@ return;
 
 
 
-
-let excel=[];
-
+let excelData = [];
 
 
 
 reportData.forEach(item=>{
 
 
-excel.push({
-
+excelData.push({
 
 Employee:
-
 item.employee.full_name,
 
 
 Department:
-
 item.employee.department || "-",
 
 
-
-Total_Days:
-
+Working_Days:
 item.totalDays,
 
 
-
 Present:
-
 item.present,
 
 
-
 Late:
-
 item.late,
 
 
-
-Absent:
-
-item.absent,
-
-
-
 Leave:
-
 item.leave,
 
 
-
-Working_Hours:
-
-item.workingHours,
-
+Absent:
+item.absent,
 
 
 Attendance_Percentage:
-
 item.percentage+"%"
 
 
-});
-
-
 
 });
 
+
+});
 
 
 
 
 
 let sheet =
-
 XLSX.utils.json_to_sheet(
-excel
+excelData
 );
 
 
 
-
-
 let workbook =
-
 XLSX.utils.book_new();
-
-
 
 
 
@@ -1053,11 +858,9 @@ workbook,
 
 sheet,
 
-"Employee Summary"
+"Attendance Report"
 
 );
-
-
 
 
 
@@ -1065,7 +868,7 @@ XLSX.writeFile(
 
 workbook,
 
-"Modern_Teams_Employee_Report.xlsx"
+"Modern_Teams_Attendance_Report.xlsx"
 
 );
 
@@ -1079,11 +882,9 @@ workbook,
 
 
 
-
-
-// =======================================
+// =====================================================
 // PDF EXPORT
-// =======================================
+// =====================================================
 
 
 function exportPDF(){
@@ -1106,23 +907,17 @@ return;
 
 
 
-
 const {
+
 jsPDF
 
-}
-
-=
-window.jspdf;
-
+}=window.jspdf;
 
 
 
 
 let doc =
-
 new jsPDF();
-
 
 
 
@@ -1130,7 +925,7 @@ new jsPDF();
 
 doc.text(
 
-"Modern Teams HRMS Employee Report",
+"Modern Teams HRMS Attendance Report",
 
 14,
 
@@ -1142,16 +937,8 @@ doc.text(
 
 
 
-
-let rows=[];
-
-
-
-
-reportData.forEach(item=>{
-
-
-rows.push([
+let rows =
+reportData.map(item=>[
 
 
 item.employee.full_name,
@@ -1160,13 +947,7 @@ item.employee.full_name,
 item.employee.department || "-",
 
 
-item.totalDays,
-
-
 item.present,
-
-
-item.absent,
 
 
 item.late,
@@ -1175,15 +956,13 @@ item.late,
 item.leave,
 
 
+item.absent,
+
+
 item.percentage+"%"
 
 
-
 ]);
-
-
-});
-
 
 
 
@@ -1193,14 +972,10 @@ item.percentage+"%"
 
 doc.autoTable({
 
-
-
 startY:30,
 
 
-
 head:[
-
 
 [
 
@@ -1208,20 +983,18 @@ head:[
 
 "Department",
 
-"Days",
-
 "Present",
-
-"Absent",
 
 "Late",
 
 "Leave",
 
+"Absent",
+
 "Attendance %"
 
-]
 
+]
 
 ],
 
@@ -1254,10 +1027,9 @@ doc.save(
 
 
 
-
-// =======================================
-// PRINT
-// =======================================
+// =====================================================
+// PRINT REPORT
+// =====================================================
 
 
 function printReport(){
@@ -1275,10 +1047,9 @@ window.print();
 
 
 
-
-// =======================================
-// RESET
-// =======================================
+// =====================================================
+// RESET FILTER
+// =====================================================
 
 
 function resetReport(){
@@ -1289,14 +1060,11 @@ document
 .querySelectorAll(
 ".filter-card input"
 )
+.forEach(input=>{
 
-.forEach(e=>{
-
-e.value="";
+input.value="";
 
 });
-
-
 
 
 
@@ -1304,18 +1072,78 @@ document
 .querySelectorAll(
 ".filter-card select"
 )
+.forEach(select=>{
 
-.forEach(e=>{
-
-e.value="";
+select.value="";
 
 });
 
 
 
 
+reportData=[];
 
-generateReport();
+
+
+document.getElementById(
+"reportTableBody"
+).innerHTML=`
+
+<tr>
+
+<td colspan="8">
+
+Generate report to view data
+
+</td>
+
+</tr>
+
+`;
+
+
+
+}
+
+
+
+
+
+// =====================================================
+// DEFAULT DATE
+// =====================================================
+
+
+function setDefaultDates(){
+
+
+let today =
+new Date();
+
+
+
+let first =
+new Date(
+today.getFullYear(),
+today.getMonth(),
+1
+);
+
+
+
+
+document.getElementById(
+"reportFromDate"
+).value =
+formatDate(first);
+
+
+
+
+document.getElementById(
+"reportToDate"
+).value =
+formatDate(today);
 
 
 
@@ -1327,11 +1155,9 @@ generateReport();
 
 
 
-
-
-// =======================================
+// =====================================================
 // EVENTS
-// =======================================
+// =====================================================
 
 
 document.addEventListener(
@@ -1339,6 +1165,12 @@ document.addEventListener(
 "DOMContentLoaded",
 
 ()=>{
+
+
+
+
+
+setDefaultDates();
 
 
 
@@ -1356,7 +1188,6 @@ document
 generateReport
 
 );
-
 
 
 
@@ -1430,48 +1261,7 @@ resetReport
 
 
 
-
-// auto load today
-
-
-let from =
-
-document.getElementById(
-"reportFromDate"
-);
-
-
-
-let to =
-
-document.getElementById(
-"reportToDate"
-);
-
-
-
-
-
-if(from && !from.value){
-
-from.value =
-getTodayDate();
-
-}
-
-
-
-
-if(to && !to.value){
-
-to.value =
-getTodayDate();
-
-}
-
-
-
-
+// auto generate
 
 generateReport();
 
