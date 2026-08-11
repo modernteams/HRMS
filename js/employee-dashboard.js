@@ -932,7 +932,7 @@ return;
 
 
 alert(
-"✅ Check In Successful"
+"✅ Punch In Successful"
 );
 
 
@@ -1187,7 +1187,7 @@ return;
 
 
 alert(
-"✅ Check Out Successful"
+"✅ Punch Out Successful"
 );
 
 
