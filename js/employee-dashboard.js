@@ -50,8 +50,11 @@ async function loadTodayAttendance() {
     return;
   }
 
+  // DOM Elements Reference
   const statusBadge = document.getElementById("employeeStatus");
   const attendanceStatusElement = document.getElementById("attendanceStatus");
+  const topStatusCard = document.getElementById("todayStatusCard");
+  const topWorkingHoursCard = document.getElementById("workingHoursCard");
 
   // CASE 1: Punch In Nahi Hua Hai -> INACTIVE
   if (!data || !data.check_in) {
@@ -59,9 +62,12 @@ async function loadTodayAttendance() {
       statusBadge.innerText = "Inactive";
       statusBadge.className = "badge badge-danger";
     }
+    if (topStatusCard) topStatusCard.innerText = "Inactive";
+    if (topWorkingHoursCard) topWorkingHoursCard.innerText = "0h 0m";
     if (attendanceStatusElement) {
       attendanceStatusElement.innerText = "Not Checked In";
     }
+
     if (document.getElementById("checkInTime")) document.getElementById("checkInTime").innerText = "--";
     if (document.getElementById("checkOutTime")) document.getElementById("checkOutTime").innerText = "--";
     if (document.getElementById("workingHours")) document.getElementById("workingHours").innerText = "--";
@@ -91,15 +97,23 @@ async function loadTodayAttendance() {
     data.working_hours = calculatedHrs;
   }
 
-  // CASE 2: Punch In Ho Chuka Hai & Check Out Pendng -> ACTIVE
+  // CASE 2: Punch In Ho Chuka Hai & Check Out Pending -> ACTIVE
   if (data.check_in && !data.check_out) {
     if (statusBadge) {
       statusBadge.innerText = "Active";
       statusBadge.className = "badge badge-success";
     }
+    if (topStatusCard) topStatusCard.innerText = "Active";
     if (attendanceStatusElement) {
       attendanceStatusElement.innerText = "Active (Working)";
     }
+
+    // Live Working Hours Calculation for Top Card
+    const runningHrs = calculateHours(data.check_in, new Date().toISOString());
+    const formattedHrs = formatWorkingHours(runningHrs);
+
+    if (topWorkingHoursCard) topWorkingHoursCard.innerText = formattedHrs;
+    if (document.getElementById("workingHours")) document.getElementById("workingHours").innerText = formattedHrs;
   }
 
   // CASE 3: Check Out Complete Ho Chuka Hai -> COMPLETED
@@ -108,9 +122,14 @@ async function loadTodayAttendance() {
       statusBadge.innerText = "Completed";
       statusBadge.className = "badge badge-info";
     }
+    if (topStatusCard) topStatusCard.innerText = "Completed";
     if (attendanceStatusElement) {
       attendanceStatusElement.innerText = "Completed (Checked Out)";
     }
+
+    const formattedHrs = formatWorkingHours(data.working_hours);
+    if (topWorkingHoursCard) topWorkingHoursCard.innerText = formattedHrs;
+    if (document.getElementById("workingHours")) document.getElementById("workingHours").innerText = formattedHrs;
   }
 
   // Dynamic UI Values Display
@@ -121,114 +140,116 @@ async function loadTodayAttendance() {
   if (data.check_out && document.getElementById("checkOutTime")) {
     document.getElementById("checkOutTime").innerText = formatTime(data.check_out);
   }
-
-  if (data.working_hours != null && document.getElementById("workingHours")) {
-    document.getElementById("workingHours").innerText = formatWorkingHours(data.working_hours);
-  }
 }
 
 // ==========================
 // CHECK IN BUTTON
 // ==========================
-document.getElementById("checkInBtn").addEventListener("click", async () => {
-  if (!currentEmployee) return;
+const checkInBtn = document.getElementById("checkInBtn");
+if (checkInBtn) {
+  checkInBtn.addEventListener("click", async () => {
+    if (!currentEmployee) return;
 
-  const today = new Date().toISOString().split("T")[0];
-  const now = new Date().toISOString();
+    const today = new Date().toISOString().split("T")[0];
+    const now = new Date().toISOString();
 
-  const { data: exist } = await supabaseClient
-    .from("attendance")
-    .select("*")
-    .eq("employee_id", currentEmployee.id)
-    .eq("attendance_date", today)
-    .maybeSingle();
+    const { data: exist } = await supabaseClient
+      .from("attendance")
+      .select("*")
+      .eq("employee_id", currentEmployee.id)
+      .eq("attendance_date", today)
+      .maybeSingle();
 
-  if (exist) {
-    alert("You already checked in today");
-    return;
-  }
-
-  const { error } = await supabaseClient.from("attendance").insert({
-    employee_id: currentEmployee.id,
-    employee_name: currentEmployee.full_name,
-    attendance_date: today,
-    check_in: now,
-    status: "Present",
-    current_work_status: "Active"
-  });
-
-  if (error) {
-    alert(error.message);
-  } else {
-    alert("✅ Check In Successful");
-    if (document.getElementById("attendanceMessage")) {
-      document.getElementById("attendanceMessage").innerText = "Check In Successful";
+    if (exist) {
+      alert("You already checked in today");
+      return;
     }
-    loadTodayAttendance();
-  }
-});
+
+    const { error } = await supabaseClient.from("attendance").insert({
+      employee_id: currentEmployee.id,
+      employee_name: currentEmployee.full_name,
+      attendance_date: today,
+      check_in: now,
+      status: "Present",
+      current_work_status: "Active"
+    });
+
+    if (error) {
+      alert(error.message);
+    } else {
+      alert("✅ Check In Successful");
+      if (document.getElementById("attendanceMessage")) {
+        document.getElementById("attendanceMessage").innerText = "Check In Successful";
+      }
+      loadTodayAttendance();
+    }
+  });
+}
 
 // ==========================
 // CHECK OUT BUTTON
 // ==========================
-document.getElementById("checkOutBtn").addEventListener("click", async () => {
-  if (!currentEmployee) return;
+const checkOutBtn = document.getElementById("checkOutBtn");
+if (checkOutBtn) {
+  checkOutBtn.addEventListener("click", async () => {
+    if (!currentEmployee) return;
 
-  const today = new Date().toISOString().split("T")[0];
-  const now = new Date();
+    const today = new Date().toISOString().split("T")[0];
+    const now = new Date();
 
-  const { data } = await supabaseClient
-    .from("attendance")
-    .select("*")
-    .eq("employee_id", currentEmployee.id)
-    .eq("attendance_date", today)
-    .maybeSingle();
+    const { data } = await supabaseClient
+      .from("attendance")
+      .select("*")
+      .eq("employee_id", currentEmployee.id)
+      .eq("attendance_date", today)
+      .maybeSingle();
 
-  if (!data) {
-    alert("Please Check In First");
-    return;
-  }
-
-  if (data.check_out) {
-    alert("You have already checked out today.");
-    return;
-  }
-
-  let finalCheckOutTime = now.toISOString();
-  let statusVal = "Present";
-
-  // Night 8:00 PM cutoff handling
-  if (now.getHours() >= 20) {
-    const checkInDate = new Date(data.check_in);
-    const auto6PM = new Date(checkInDate);
-    auto6PM.setHours(18, 0, 0, 0);
-
-    finalCheckOutTime = auto6PM.toISOString();
-    statusVal = "Auto Checked-Out";
-  }
-
-  const hoursWorked = calculateHours(data.check_in, finalCheckOutTime);
-
-  const { error } = await supabaseClient
-    .from("attendance")
-    .update({
-      check_out: finalCheckOutTime,
-      working_hours: hoursWorked,
-      status: statusVal,
-      current_work_status: "Completed"
-    })
-    .eq("id", data.id);
-
-  if (error) {
-    alert(error.message);
-  } else {
-    alert("Check Out Successful");
-    if (document.getElementById("attendanceMessage")) {
-      document.getElementById("attendanceMessage").innerText = "Check Out Successful";
+    if (!data) {
+      alert("Please Check In First");
+      return;
     }
-    await loadTodayAttendance();
-  }
-});
+
+    if (data.check_out) {
+      alert("You have already checked out today.");
+      return;
+    }
+
+    let finalCheckOutTime = now.toISOString();
+    let statusVal = "Present";
+
+    // Night 8:00 PM cutoff handling
+    if (now.getHours() >= 20) {
+      const checkInDate = new Date(data.check_in);
+      const auto6PM = new Date(checkInDate);
+      auto6PM.setHours(18, 0, 0, 0);
+
+      finalCheckOutTime = auto6PM.toISOString();
+      statusVal = "Auto Checked-Out";
+    }
+
+    const hoursWorked = calculateHours(data.check_in, finalCheckOutTime);
+
+    const { error } = await supabaseClient
+      .from("attendance")
+      .update({
+        check_out: finalCheckOutTime,
+        working_hours: hoursWorked,
+        status: statusVal,
+        current_work_status: "Completed"
+      })
+      .eq("id", data.id);
+
+    if (error) {
+      alert(error.message);
+    } else {
+      alert("Check Out Successful");
+      if (document.getElementById("attendanceMessage")) {
+        document.getElementById("attendanceMessage").innerText = "Check Out Successful";
+      }
+      await loadTodayAttendance();
+    }
+  });
+}
 
 function formatTime(timestamp) {
   if (!timestamp) return "--";
@@ -258,7 +279,7 @@ function calculateHours(start, end) {
 }
 
 function formatWorkingHours(hours) {
-  if (hours == null) return "--";
+  if (hours == null || isNaN(hours)) return "0h 0m";
   const totalMinutes = Math.round(hours * 60);
   const h = Math.floor(totalMinutes / 60);
   const m = totalMinutes % 60;
@@ -277,7 +298,7 @@ async function loadAnnouncements() {
 
   box.innerHTML = "";
 
-  if (data) {
+  if (data && data.length > 0) {
     data.forEach((item) => {
       box.innerHTML += `
         <div class="activity">
@@ -285,6 +306,8 @@ async function loadAnnouncements() {
         </div>
       `;
     });
+  } else {
+    box.innerHTML = "<p>No announcements</p>";
   }
 }
 
