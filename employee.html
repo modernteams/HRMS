@@ -2,639 +2,158 @@
 <html lang="en">
 
 <head>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/employee-dashboard.css">
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="css/variables.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/employee-dashboard.css">
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>
-Modern Teams - Employee Dashboard
-</title>
-
+  <title>Modern Teams - Employee Dashboard</title>
 </head>
-
 
 <body>
 
-
-<div class="app-layout">
-
-
-
-<!-- ======================
-     SIDEBAR
-====================== -->
-
-
-
-<button id="menuToggle" class="menu-toggle">
-☰
-</button>
-
-
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-<aside class="sidebar">
-
-
-<div class="logo">
-
-
-<img src="assets/logo/mt-logo.jpeg" alt="Logo">
-
-
-<h2>
-Modern Teams
-</h2>
-
-
-</div>
-
-
-
-<nav class="menu">
-
-
-<a class="active" href="employee.html">
-🏠 Dashboard
-</a>
-
-
-<a href="employee-attendance.html">
-🕒 My Attendance
-</a>
-
-
-<a href="employee-leaves.html">
-📄 My Leaves
-</a>
-
-
-<a href="employee-announcements.html">
-📢 Announcements
-</a>
-
-
-<a href="employee-profile.html">
-⚙ Profile
-</a>
-
-
-<a href="login.html" onclick="logout()">
-🚪 Logout
-</a>
-
-
-</nav>
-
-
-</aside>
-
-
-
-
-
-
-
-<!-- ======================
-     MAIN CONTENT
-====================== -->
-
-
-<main class="main-content">
-
-
-
-
-
-<!-- ======================
-     TOP HEADER
-====================== -->
-
-
-<header class="topbar">
-
-
-<div class="employee-heading">
-
-
-<h1 id="greetingText">
-
-Good Morning, Employee 👋
-
-</h1>
-
-
-<p>
-
-Modern Teams HRMS
-
-</p>
-
-
-</div>
-
-
-
-
-
-<div class="employee-info">
-
-<div class="notification-wrapper"
-onclick="openNotifications()">
-
-
-
-<div class="notification">
-
-
-🔔
-
-
-<span 
-id="notificationCount"
-class="notification-badge">
-</span>
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-<div class="avatar">
-
-E
-
-</div>
-
-
-
-</div>
-
-
-</header>
-
-
-
-
-
-
-
-
-
-<section class="content dashboard">
-
-
-
-
-
-
-
-<!-- ======================
-     PROFILE HERO
-====================== -->
-
-
-<div class="profile-hero">
-
-
-
-<div class="profile-image">
-
-
-<img 
-id="employeePhoto"
-src="assets/images/default-user.png"
-alt="Employee Photo">
-
-
-</div>
-
-
-
-
-
-<div class="profile-details">
-
-
-
-<h2 id="employeeName">
-
-Employee Name
-
-</h2>
-
-
-
-<p id="employeeDesignation">
-
-Designation
-
-</p>
-
-
-
-<p id="employeeDepartment">
-
-Department
-
-</p>
-
-
-
-
-<span class="status-badge">
-
-🟢 Active Employee
-
-</span>
-
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- ======================
-     STATS
-====================== -->
-
-
-<div class="stats-container">
-
-
-
-<div class="stat-box">
-
-
-<h3>
-Today's Status
-</h3>
-
-
-<h1 id="todayStatus">
-Inactive
-</h1>
-
-</div>
-
-
-
-
-
-
-<div class="card stat-box">
-
-
-<h3>
-Working Hours
-</h3>
-
-
-<h1 id="workingHours">
-
-0
-
-</h1>
-
-
-</div>
-
-
-
-
-
-
-<div class="card stat-box">
-
-
-<h3>
-Remaining Leaves
-</h3>
-
-
-<h1 id="leaveCount">
-
-0
-
-</h1>
-
-
-</div>
-
-
-
-
-
-
-<div class="card stat-box">
-
-
-<h3>
-Performance Score
-</h3>
-
-
-<h1 id="performanceScore">
-
-0%
-
-</h1>
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<!-- ======================
-     ATTENDANCE + ACTION
-====================== -->
-
-
-<div class="dashboard-grid">
-
-
-
-
-
-<div class="attendance-card">
-
-
-<h2>
-
-Today's Attendance
-
-</h2>
-
-
-
-
-<div class="attendance-buttons">
-
-
-
-<button id="checkInBtn">
-
-✅ Punch In
-
-</button>
-
-
-
-
-<button id="checkOutBtn">
-
-🚪 Punch Out
-
-</button>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-<div class="attendance-info">
-
-
-
-<p>
-
-Punch In
-
-<span id="checkInTime">
-
---
-
-</span>
-
-</p>
-
-
-
-
-
-<p>
-
-Punch Out
-
-<span id="checkOutTime">
-
---
-
-</span>
-
-</p>
-
-
-
-
-
-<p>
-
-Status
-<span id="attendanceStatus">
---
-</span>
-</p>
-
-</div>
-
-
-
-<p id="attendanceMessage"></p>
-
-
-
-</div>
-
-
-
-
-
-
-<!-- ======================
-     BREAK MANAGEMENT
-====================== -->
-
-
-<div class="break-card">
-
-
-<h2>
-⏱ Break Management
-</h2>
-
-
-<div class="break-buttons">
-
-
-<button id="lunchBreakBtn">
-🍽 Lunch
-</button>
-
-
-<button id="teaBreakBtn">
-☕ Tea
-</button>
-
-
-<button id="otherBreakBtn">
-⚙ Other
-</button>
-
-
-<button id="endBreakBtn">
-⏹ End Break
-</button>
-
-
-</div>
-
-
-
-<div class="break-info">
-
-
-<h1 id="breakTimer">
-00:00:00
-</h1>
-
-
-<p id="breakStatus">
-No Active Break
-</p>
-
-
-</div>
-
-
-
-</div>
-
-
-
-</div>
-
-
-<!-- QUICK ACTIONS START -->
-
-<div class="quick-actions">
-
-
-<h2>
-Quick Actions
-</h2>
-
-
-<button>
-<a href="employee-leaves.html">
-📝 Apply Leave
-</a>
-</button>
-
-
-<button>
-<a href="employee-announcements.html">
-📢 View Announcements
-</a>
-</button>
-
-
-<button>
-<a href="employee-profile.html">
-👤 Update Profile
-</a>
-</button>
-
-
-</div>
-
-
-<!-- QUICK ACTIONS END -->
-
-
-
-</section>
-
-
-
-
-
-
-</main>
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="js/supabase.js"></script>
-
-<script src="js/auth.js"></script>
-
-<script src="js/employee-dashboard.js"></script>
-
-<script src="js/sidebar.js"></script>
-
-<script src="js/notification.js"></script>
-
-
-<script>
-
-employeeGuard();
-
-</script>
-
-
+  <div class="app-layout">
+
+    <!-- ======================
+         SIDEBAR
+    ====================== -->
+    <aside class="sidebar">
+
+      <div class="logo">
+        <img src="assets/logo/mt-logo.jpeg" alt="Logo">
+        <h2>Modern Teams</h2>
+      </div>
+
+      <nav class="menu">
+        <a class="active" href="employee.html">🏠 Dashboard</a>
+        <a href="employee-attendance.html">🕒 My Attendance</a>
+        <a href="employee-leaves.html">📄 My Leaves</a>
+        <a href="employee-announcements.html">📢 Announcements</a>
+        <a href="employee-profile.html">⚙ Profile</a>
+        <a href="login.html" onclick="logout()">🚪 Logout</a>
+      </nav>
+
+    </aside>
+
+    <!-- ======================
+         MAIN CONTENT
+    ====================== -->
+    <main class="main-content">
+
+      <header class="topbar">
+        <div>
+          <h1>Employee Dashboard</h1>
+          <p>Modern Teams HRMS</p>
+        </div>
+
+        <div class="employee-info">
+          <div class="notification">🔔</div>
+          <div class="avatar">E</div>
+        </div>
+      </header>
+
+      <section class="content dashboard">
+
+        <!-- WELCOME -->
+        <div class="card welcome-box">
+          <h2 id="employeeGreeting">Good Morning 👋</h2>
+          <p>Welcome back to Modern Teams</p>
+        </div>
+
+        <!-- PROFILE SUMMARY -->
+        <div class="card profile-summary">
+          <img id="employeePhoto" src="assets/images/default-user.png" alt="Employee Photo">
+          <div>
+            <h2 id="employeeName">Employee Name</h2>
+            <p id="employeeDepartment">Department</p>
+            <p id="employeeDesignation">Designation</p>
+            <span id="employeeStatus" class="badge badge-danger">Inactive</span>
+          </div>
+        </div>
+
+        <!-- DASHBOARD CARDS -->
+        <div class="stats-container">
+
+          <div class="card">
+            <h3>Today's Status</h3>
+            <h1 id="todayStatusCard">Inactive</h1>
+          </div>
+
+          <div class="card">
+            <h3>Working Hours</h3>
+            <h1 id="workingHoursCard">0h 0m</h1>
+          </div>
+
+          <div class="card">
+            <h3>Assigned Tasks</h3>
+            <h1 id="taskCount">0</h1>
+          </div>
+
+          <div class="card">
+            <h3>Remaining Leaves</h3>
+            <h1 id="leaveCount">0</h1>
+          </div>
+
+          <div class="card">
+            <h3>Performance Score</h3>
+            <h1 id="performanceScore">0%</h1>
+          </div>
+
+        </div>
+
+        <!-- ATTENDANCE CARD -->
+        <div class="card attendance-card">
+          <h2>Today's Attendance</h2>
+          <p id="attendanceStatus" style="font-weight: bold; margin-bottom: 10px;">Not Checked In</p>
+
+          <div class="attendance-buttons">
+            <button id="checkInBtn">✅ Check In</button>
+            <button id="checkOutBtn">🚪 Check Out</button>
+          </div>
+
+          <div class="attendance-info">
+            <p>Check In: <span id="checkInTime">--</span></p>
+            <p>Check Out: <span id="checkOutTime">--</span></p>
+            <p>Working Hours: <span id="workingHours">--</span></p>
+          </div>
+
+          <p id="attendanceMessage"></p>
+        </div>
+
+        <!-- TASK SECTION -->
+        <div class="card section-card">
+          <h2>My Tasks</h2>
+          <div id="taskList">
+            <p>No tasks assigned</p>
+          </div>
+        </div>
+
+        <!-- ANNOUNCEMENT SECTION -->
+        <div class="section-card">
+          <h2>Latest Announcements</h2>
+          <div id="announcementPreview">
+            <p>No announcements</p>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/employee-dashboard.js"></script>
+
+  <script>
+    employeeGuard();
+  </script>
 
 </body>
 
