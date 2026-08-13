@@ -26,49 +26,6 @@ function formatDate(date){
 
 
 
-function normalizeDate(value){
-
-    if(!value){
-        return null;
-    }
-
-    // Date object
-    if(value instanceof Date){
-
-        if(isNaN(value.getTime())){
-            return null;
-        }
-
-        return formatDate(value);
-
-    }
-
-
-    // YYYY-MM-DD directly
-    if(
-        typeof value === "string" &&
-        /^\d{4}-\d{2}-\d{2}$/.test(value)
-    ){
-
-        return value;
-
-    }
-
-
-    let date = new Date(value);
-
-
-    if(isNaN(date.getTime())){
-        return null;
-    }
-
-
-    return formatDate(date);
-
-}
-
-
-
 function getWorkingDays(from,to,holidays){
 
 
@@ -91,9 +48,7 @@ function getWorkingDays(from,to,holidays){
 
 
 
-        // ==========================================
-        // SUNDAY = WEEK OFF
-        // ==========================================
+        // Sunday remove
 
         if(day!==0 && 
         !holidays.includes(date)){
@@ -158,16 +113,16 @@ return;
 
 
 
-// =====================================================
+
+
+// =============================
 // HOLIDAYS
-// =====================================================
+// =============================
 
 
 const {
 
-data:holidays,
-
-error:holidayError
+data:holidays
 
 }=await supabaseClient
 
@@ -180,31 +135,17 @@ error:holidayError
 
 
 
-if(holidayError){
-
-    console.error(
-        "Holiday loading error:",
-        holidayError
-    );
-
-}
-
-
-
 holidaysData =
 (holidays || [])
-.map(h=>
-    normalizeDate(h.holiday_date)
-)
-.filter(Boolean);
+.map(h=>h.holiday_date);
 
 
 
 
 
-// =====================================================
+// =============================
 // WORKING DAYS
-// =====================================================
+// =============================
 
 
 let workingDays =
@@ -225,16 +166,15 @@ workingDays
 
 
 
-// =====================================================
+
+// =============================
 // EMPLOYEES
-// =====================================================
+// =============================
 
 
 const {
 
-data:employees,
-
-error:employeeError
+data:employees
 
 }=await supabaseClient
 
@@ -256,35 +196,16 @@ role
 
 
 
-if(employeeError){
-
-    console.error(
-        "Employee loading error:",
-        employeeError
-    );
-
-    alert(
-        "Unable to load employees"
-    );
-
-    return;
-
-}
 
 
-
-
-
-// =====================================================
+// =============================
 // ATTENDANCE
-// =====================================================
+// =============================
 
 
 const {
 
-data:attendance,
-
-error:attendanceError
+data:attendance
 
 }=await supabaseClient
 
@@ -308,35 +229,18 @@ toDate
 
 
 
-if(attendanceError){
-
-    console.error(
-        "Attendance loading error:",
-        attendanceError
-    );
-
-    alert(
-        "Unable to load attendance"
-    );
-
-    return;
-
-}
 
 
 
 
-
-// =====================================================
+// =============================
 // LEAVES
-// =====================================================
+// =============================
 
 
 const {
 
-data:leaves,
-
-error:leaveError
+data:leaves
 
 }=await supabaseClient
 
@@ -354,28 +258,6 @@ error:leaveError
 
 
 
-if(leaveError){
-
-    console.error(
-        "Leave loading error:",
-        leaveError
-    );
-
-    alert(
-        "Unable to load approved leaves"
-    );
-
-    return;
-
-}
-
-
-
-
-
-// =====================================================
-// BUILD REPORT
-// =====================================================
 
 
 buildEmployeeReport(
@@ -388,7 +270,6 @@ workingDays
 
 
 }
-
 
 
 // =====================================================
@@ -423,353 +304,149 @@ let leave=0;
 
 
 
-// =====================================================
-// EMPLOYEE APPROVED LEAVE DATES
-// =====================================================
-
-
-let employeeLeaves =
-leaves.filter(l=>{
-
-    return String(
-        l.employee_id
-    ) === String(
-        emp.id
-    );
-
-});
+let totalWorkingDays =
+workingDays.length;
 
 
 
-
-
-// =====================================================
-// CHECK EVERY WORKING DAY
-// =====================================================
 
 
 workingDays.forEach(date=>{
 
 
 
-// =====================================================
-// LEAVE CHECK
-// =====================================================
-
-
-let isLeave =
-employeeLeaves.some(l=>{
-
-
-    let leaveFrom =
-        normalizeDate(
-            l.from_date
-        );
-
-
-    let leaveTo =
-        normalizeDate(
-            l.to_date
-        );
-
-
-    if(!leaveFrom || !leaveTo){
-
-        return false;
-
-    }
-
-
-    return (
-        date >= leaveFrom &&
-        date <= leaveTo
-    );
-
-
-});
-
-
-
-
-
-// =====================================================
-// APPROVED LEAVE
-// =====================================================
-
-
-if(isLeave){
-
-
-    leave++;
-
-
-    // IMPORTANT:
-    // Leave ko Present/Absent me count nahi karna
-
-    return;
-
-
-}
-
-
-
-
-
-// =====================================================
-// FIND ATTENDANCE
-// =====================================================
+// =========================
+// ATTENDANCE FIND
+// =========================
 
 
 let att =
-attendance.find(a=>{
+attendance.find(a=>
 
+String(a.employee_id)
+===
+String(emp.id)
 
-    let attendanceEmployee =
-        a.employee_id;
+&&
 
+a.attendance_date===date
 
-    let attendanceDate =
-        normalizeDate(
-            a.attendance_date
-        );
+);
 
 
-    return (
 
-        String(
-            attendanceEmployee
-        ) === String(
-            emp.id
-        )
 
-        &&
+// =========================
+// LEAVE CHECK
+// =========================
 
-        attendanceDate === date
 
-    );
+let isLeave =
+leaves.some(l=>
 
+String(l.employee_id)
+===
+String(emp.id)
 
-});
+&&
 
+date >= l.from_date
 
+&&
 
+date <= l.to_date
 
-
-// =====================================================
-// NO ATTENDANCE ROW
-// =====================================================
-
-
-// Working day
-// + No approved leave
-// + No attendance
-// = ABSENT
-
-
-if(!att){
-
-
-    absent++;
-
-
-    return;
-
-
-}
-
-
-
-
-
-// =====================================================
-// ATTENDANCE STATUS
-// =====================================================
-
-
-let status =
-String(
-    att.status || ""
-)
-.toLowerCase()
-.trim();
-
-
-
-let checkIn =
-att.check_in;
-
-
-
-
-
-// =====================================================
-// MANUALLY MARKED PRESENT
-// =====================================================
-
-
-// Agar SQL se manually:
-//
-// status = Present
-//
-// add kiya gaya hai,
-// to Present count hoga even if
-// check_in blank hai.
-
-
-if(
-    status === "present" ||
-    status === "completed" ||
-    status === "late"
-){
-
-
-    present++;
-
-
-    if(status === "late"){
-
-        late++;
-
-    }
-
-
-    return;
-
-}
-
-
-
-
-
-// =====================================================
-// CHECK-IN EXISTS
-// =====================================================
-
-
-// Normal attendance
-// check_in available hai
-
-
-if(checkIn){
-
-
-
-    let checkInDate =
-        new Date(checkIn);
-
-
-
-    // Invalid date protection
-
-    if(
-        isNaN(
-            checkInDate.getTime()
-        )
-    ){
-
-        // Row exists but invalid
-        // check-in => Absent
-
-        absent++;
-
-        return;
-
-    }
-
-
-
-
-
-    // =================================================
-    // OFFICE LATE TIME = 10:15 AM
-    // =================================================
-
-
-    let officeTime =
-        new Date(
-            `${date}T10:15:00`
-        );
-
-
-
-    // =================================================
-    // LATE
-    // =================================================
-
-
-    if(checkInDate > officeTime){
-
-
-        late++;
-
-        present++;
-
-
-    }
-
-    else{
-
-
-        present++;
-
-    }
-
-
-    return;
-
-}
-
-
-
-
-
-// =====================================================
-// FALLBACK
-// =====================================================
-
-
-// Attendance row exists
-// but neither status nor check_in exists.
-//
-// Working day hai, leave nahi hai.
-//
-// Therefore Absent.
-
-
-absent++;
-
-
-
-});
-
-
-
-
-
-// =====================================================
-// EFFECTIVE WORKING DAYS
-// =====================================================
-
-
-// Sunday aur holiday already workingDays me nahi hain.
-//
-// Approved leave bhi attendance percentage
-// ke denominator se remove hoga.
-
-
-let totalWorkingDays =
-Math.max(
-    0,
-    workingDays.length - leave
 );
 
 
 
 
 
-// =====================================================
-// ATTENDANCE PERCENTAGE
-// =====================================================
+// =========================
+// STATUS CALCULATION
+// =========================
+
+
+
+if(isLeave){
+
+
+leave++;
+
+
+return;
+
+
+}
+
+
+
+
+
+if(!att){
+
+
+absent++;
+
+
+return;
+
+
+}
+
+
+
+
+
+let checkIn =
+new Date(
+att.check_in
+);
+
+
+
+
+let officeTime =
+new Date(date);
+
+
+
+officeTime.setHours(
+10,
+15,
+0
+);
+
+
+
+
+
+if(checkIn > officeTime){
+
+
+late++;
+
+present++;
+
+
+}
+
+else{
+
+
+present++;
+
+
+}
+
+
+
+});
+
+
+
+
+
 
 
 let percentage=0;
@@ -779,12 +456,12 @@ let percentage=0;
 if(totalWorkingDays>0){
 
 
-    percentage =
-        Math.round(
-            (present / totalWorkingDays)
-            *
-            100
-        );
+percentage =
+Math.round(
+(present / totalWorkingDays)
+*
+100
+);
 
 
 }
@@ -793,39 +470,30 @@ if(totalWorkingDays>0){
 
 
 
-// =====================================================
-// REPORT DATA
-// =====================================================
 
 
 reportData.push({
 
 
-    employee:emp,
+employee:emp,
 
 
-    totalDays:
-        totalWorkingDays,
+totalDays:totalWorkingDays,
 
 
-    present:
-        present,
+present:present,
 
 
-    late:
-        late,
+late:late,
 
 
-    absent:
-        absent,
+absent:absent,
 
 
-    leave:
-        leave,
+leave:leave,
 
 
-    percentage:
-        percentage
+percentage:percentage
 
 
 
@@ -834,7 +502,6 @@ reportData.push({
 
 
 });
-
 
 
 
@@ -847,23 +514,10 @@ reportData
 
 
 
-
-// =====================================================
-// SUMMARY
-// =====================================================
-
-
 calculateSummary(
 reportData
 );
 
-
-
-
-
-// =====================================================
-// RENDER
-// =====================================================
 
 
 renderReport(
@@ -873,7 +527,6 @@ reportData
 
 
 }
-
 
 
 
@@ -933,7 +586,6 @@ totalLeave += item.leave;
 
 
 
-
 document.getElementById(
 "presentCount"
 ).innerText =
@@ -969,6 +621,7 @@ totalLeave;
 
 
 
+
 // =====================================================
 // TABLE RENDER
 // =====================================================
@@ -982,7 +635,6 @@ let table =
 document.getElementById(
 "reportTableBody"
 );
-
 
 
 
@@ -1016,7 +668,6 @@ return;
 
 
 let html="";
-
 
 
 
@@ -1113,10 +764,6 @@ table.innerHTML=html;
 
 
 }
-
-
-
-
 
 // =====================================================
 // EXCEL EXPORT
@@ -1233,6 +880,8 @@ workbook,
 
 
 
+
+
 // =====================================================
 // PDF EXPORT
 // =====================================================
@@ -1258,13 +907,11 @@ return;
 
 
 
-
 const {
 
 jsPDF
 
 }=window.jspdf;
-
 
 
 
@@ -1346,6 +993,7 @@ head:[
 
 "Attendance %"
 
+
 ]
 
 ],
@@ -1376,6 +1024,9 @@ doc.save(
 
 
 
+
+
+
 // =====================================================
 // PRINT REPORT
 // =====================================================
@@ -1388,6 +1039,8 @@ window.print();
 
 
 }
+
+
 
 
 
@@ -1428,7 +1081,6 @@ select.value="";
 
 
 
-
 reportData=[];
 
 
@@ -1457,7 +1109,6 @@ Generate report to view data
 
 
 
-
 // =====================================================
 // DEFAULT DATE
 // =====================================================
@@ -1481,12 +1132,10 @@ today.getMonth(),
 
 
 
-
 document.getElementById(
 "reportFromDate"
 ).value =
 formatDate(first);
-
 
 
 
@@ -1539,7 +1188,6 @@ document
 generateReport
 
 );
-
 
 
 
