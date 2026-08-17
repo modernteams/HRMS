@@ -298,6 +298,9 @@ class="form-control">
 Attendance Summary
 </option>
 
+<option value="payroll">
+    Payroll Report
+</option>
 
 <option value="daily">
 Daily Attendance
@@ -451,83 +454,31 @@ Attendance Report
 
 
 <table>
-
 <thead>
-
-
 <tr>
 
-
-<th>
-Employee
-</th>
-
-
-
-<th>
-Department
-</th>
-
-
-
-<th>
-Total Days
-</th>
-
-
-
-<th>
-Present
-</th>
-
-
-
-<th>
-Late
-</th>
-
-
-
-<th>
-Absent
-</th>
-
-
-
-<th>
-Leave
-</th>
-
-
-
-<th>
-Working Hours
-</th>
-
-
-
-<th>
-Attendance %
-</th>
-
+    <th>Employee</th>
+    <th>Department</th>
+    <th>Working Days</th>
+    <th>Present</th>
+    <th>Half Day</th>
+    <th>Absent</th>
+    <th>On Leave</th>
+    <th>Late</th>
+    <th>Payroll Points</th>
 
 </tr>
-
-
 </thead>
+
 <tbody id="reportTableBody">
 
-
 <tr>
 
-<td colspan="9" style="text-align:center">
-
-Generate report to view data
-
-</td>
+    <td colspan="9" style="text-align:center;">
+        Generate report to view data
+    </td>
 
 </tr>
-
 
 </tbody>
 
@@ -541,13 +492,7 @@ Generate report to view data
 </div>
 
 
-
-
-
-
-
 </section>
-
 
 
 </main>
@@ -567,7 +512,7 @@ Generate report to view data
 <!-- ==========================
         SCRIPTS
 ========================== -->
-<<!-- Export Libraries -->
+<!-- Export Libraries -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
