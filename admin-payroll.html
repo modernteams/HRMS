@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Modern Teams - Payroll</title>
+
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <style>
+
+        .payroll-section {
+            padding: 20px;
+        }
+
+        .payroll-filter {
+            margin-bottom: 20px;
+        }
+
+        .payroll-filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .payroll-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .payroll-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .payroll-card {
+            padding: 20px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+        }
+
+        .payroll-card h3 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .payroll-card strong {
+            font-size: 26px;
+        }
+
+        .payroll-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .payroll-points {
+            font-weight: 700;
+        }
+
+        .points-good {
+            color: #15803d;
+        }
+
+        .points-warning {
+            color: #ca8a04;
+        }
+
+        .points-danger {
+            color: #dc2626;
+        }
+
+        .deduction {
+            color: #dc2626;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+
+    <button id="menuToggle" class="menu-toggle">
+        ☰
+    </button>
+
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <img
+                src="assets/logo/mt-logo.jpeg"
+                alt="Logo"
+            >
+
+            <h2>Modern Teams</h2>
+
+        </div>
+
+
+        <nav class="menu">
+
+            <a href="admin.html">
+                🏠 Dashboard
+            </a>
+
+            <a href="admin-employees.html">
+                👥 Employees
+            </a>
+
+            <a href="admin-attendance.html">
+                🕒 Attendance
+            </a>
+
+            <a class="active" href="admin-payroll.html">
+                💰 Payroll
+            </a>
+
+            <a href="admin-reports.html">
+                📊 Reports
+            </a>
+
+            <a href="admin-leaves.html">
+                📄 Leaves
+            </a>
+
+            <a href="admin-announcements.html">
+                📢 Announcements
+            </a>
+
+            <a href="admin-holidays.html">
+                🎉 Holidays
+            </a>
+
+            <a href="admin-profile.html">
+                ⚙ Profile
+            </a>
+
+            <a
+                href="login.html"
+                onclick="logout()"
+            >
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Payroll
+                </h1>
+
+                <p>
+                    Monthly employee payroll points
+                </p>
+
+            </div>
+
+
+            <div class="admin-info">
+
+                <div class="notification">
+                    🔔
+                </div>
+
+                <div class="avatar">
+                    MT
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="content payroll-section">
+
+
+            <!-- FILTER -->
+
+            <div class="card filter-card payroll-filter">
+
+                <div class="payroll-filter-grid">
+
+
+                    <div>
+
+                        <label for="payrollMonth">
+                            Select Month
+                        </label>
+
+                        <input
+                            type="month"
+                            id="payrollMonth"
+                            class="form-control"
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="payrollEmployee">
+                            Employee
+                        </label>
+
+                        <select
+                            id="payrollEmployee"
+                            class="form-control"
+                        >
+
+                            <option value="">
+                                All Employees
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="payroll-actions">
+
+                    <button
+                        id="generatePayrollBtn"
+                        class="btn btn-primary"
+                    >
+                        Generate Payroll
+                    </button>
+
+
+                    <button
+                        id="resetPayrollBtn"
+                        class="btn btn-secondary"
+                    >
+                        Reset
+                    </button>
+
+
+                    <button
+                        id="exportPayrollBtn"
+                        class="btn btn-primary"
+                    >
+                        Export Excel
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUMMARY -->
+
+            <div class="payroll-summary">
+
+
+                <div class="payroll-card">
+
+                    <h3>
+                        Total Employees
+                    </h3>
+
+                    <strong id="payrollEmployeeCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="payroll-card">
+
+                    <h3>
+                        Monthly Base
+                    </h3>
+
+                    <strong>
+                        30
+                    </strong>
+
+                </div>
+
+
+                <div class="payroll-card">
+
+                    <h3>
+                        Total Half Days
+                    </h3>
+
+                    <strong id="payrollHalfDayCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="payroll-card">
+
+                    <h3>
+                        Total Absents
+                    </h3>
+
+                    <strong id="payrollAbsentCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="payroll-card">
+
+                    <h3>
+                        Average Payroll Points
+                    </h3>
+
+                    <strong id="payrollAveragePoints">
+                        30
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="table-card table-section">
+
+                <h2>
+                    Monthly Payroll Summary
+                </h2>
+
+
+                <div class="payroll-table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Employee
+                                </th>
+
+                                <th>
+                                    Department
+                                </th>
+
+                                <th>
+                                    Working Days
+                                </th>
+
+                                <th>
+                                    Present
+                                </th>
+
+                                <th>
+                                    Half Day
+                                </th>
+
+                                <th>
+                                    Absent
+                                </th>
+
+                                <th>
+                                    Week Off
+                                </th>
+
+                                <th>
+                                    Holiday
+                                </th>
+
+                                <th>
+                                    Leave
+                                </th>
+
+                                <th>
+                                    Base Points
+                                </th>
+
+                                <th>
+                                    Deduction
+                                </th>
+
+                                <th>
+                                    Final Points
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="payrollTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="12"
+                                    class="no-data"
+                                >
+
+                                    Select a month and generate payroll
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<!-- SCRIPTS -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
+<script src="js/auth.js"></script>
+
+<script src="js/admin-payroll.js"></script>
+
+<script src="js/sidebar.js"></script>
+
+<!-- Excel -->
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+
+</body>
+
+</html>
