@@ -1,14 +1,35 @@
 // =====================================================
 // MODERN TEAMS HRMS
 // ADMIN REPORT ENGINE
-// Employee Wise Attendance Summary
+// FINAL ATTENDANCE + PAYROLL REPORT
+// =====================================================
+//
+// FINAL RULES
+//
+// Present          = 0 deduction
+// Half Day         = 0.5 deduction
+// Absent           = 1 deduction
+// Approved Leave   = 1 deduction
+// Holiday          = 0 deduction
+// Sunday           = 0 deduction
+//
+// Monthly Payroll Base = 30 Points
+//
+// Payroll = 30
+//           - (Half Day × 0.5)
+//           - Absent
+//           - Approved Leave
+//
+// REPORT DOES NOT USE:
+// - Working Hours
+// - Attendance Percentage
+//
 // =====================================================
 
 
 let reportData = [];
 
 let holidaysData = [];
-
 
 
 // =====================================================
@@ -18,51 +39,135 @@ let holidaysData = [];
 
 function formatDate(date){
 
-    return date
-    .toISOString()
-    .split("T")[0];
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
 
 }
 
 
+function parseDate(value){
 
-function getWorkingDays(from,to,holidays){
+    if(!value){
 
+        return null;
 
-    let days=[];
-
-
-    let start=new Date(from);
-
-    let end=new Date(to);
+    }
 
 
-
-    while(start<=end){
-
-
-        let date=formatDate(start);
-
-
-        let day=start.getDay();
+    const parts =
+        String(value)
+            .substring(0, 10)
+            .split("-");
 
 
+    if(parts.length !== 3){
 
-        // Sunday remove
+        return new Date(value);
 
-        if(day!==0 && 
-        !holidays.includes(date)){
+    }
 
+
+    return new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        Number(parts[2])
+    );
+
+}
+
+
+function normalizeDate(value){
+
+    if(!value){
+
+        return null;
+
+    }
+
+
+    return String(value)
+        .substring(0, 10);
+
+}
+
+
+// =====================================================
+// GET CALENDAR DAYS
+// =====================================================
+//
+// Sunday and Holiday are NOT working days.
+//
+// Therefore:
+// Sunday = 0 deduction
+// Holiday = 0 deduction
+//
+// =====================================================
+
+
+function getWorkingDays(
+    from,
+    to,
+    holidays
+){
+
+    const days = [];
+
+
+    let current =
+        parseDate(from);
+
+
+    const end =
+        parseDate(to);
+
+
+    while(
+        current &&
+        end &&
+        current <= end
+    ){
+
+        const date =
+            formatDate(current);
+
+
+        const day =
+            current.getDay();
+
+
+        const isSunday =
+            day === 0;
+
+
+        const isHoliday =
+            holidays.includes(date);
+
+
+        if(
+            !isSunday &&
+            !isHoliday
+        ){
 
             days.push(date);
 
         }
 
 
-        start.setDate(
-            start.getDate()+1
+        current.setDate(
+            current.getDate() + 1
         );
-
 
     }
 
@@ -72,7 +177,271 @@ function getWorkingDays(from,to,holidays){
 }
 
 
+// =====================================================
+// ATTENDANCE STATUS
+// =====================================================
+//
+// FINAL STATUS RULE
+//
+// >= 6 hours       = Present
+// 3 - <6 hours     = Half Day
+// <3 hours         = Absent
+//
+// If check-in exists but checkout is missing:
+// Present temporarily.
+//
+// Existing explicit Half Day / Absent status
+// is respected.
+//
+// =====================================================
 
+
+function getAttendanceStatus(att){
+
+    if(!att){
+
+        return "Absent";
+
+    }
+
+
+    const existingStatus =
+        String(
+            att.status || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    // Explicit Half Day
+
+    if(
+        existingStatus === "half day" ||
+        existingStatus === "halfday"
+    ){
+
+        return "Half Day";
+
+    }
+
+
+    // Explicit Absent
+
+    if(
+        existingStatus === "absent"
+    ){
+
+        return "Absent";
+
+    }
+
+
+    // No Check In
+
+    if(!att.check_in){
+
+        return "Absent";
+
+    }
+
+
+    // Check In exists but Check Out missing
+
+    if(!att.check_out){
+
+        return "Present";
+
+    }
+
+
+    // Calculate working hours only for determining status.
+    // Working hours are NOT displayed in the report.
+
+    const start =
+        new Date(att.check_in);
+
+
+    const end =
+        new Date(att.check_out);
+
+
+    if(
+        isNaN(start.getTime()) ||
+        isNaN(end.getTime())
+    ){
+
+        return "Present";
+
+    }
+
+
+    const milliseconds =
+        end.getTime() -
+        start.getTime();
+
+
+    if(milliseconds < 0){
+
+        return "Present";
+
+    }
+
+
+    const hours =
+        milliseconds /
+        (1000 * 60 * 60);
+
+
+    // Present
+
+    if(hours >= 6){
+
+        return "Present";
+
+    }
+
+
+    // Half Day
+
+    if(hours >= 3){
+
+        return "Half Day";
+
+    }
+
+
+    // Absent
+
+    return "Absent";
+
+}
+
+
+// =====================================================
+// LATE CHECK
+// =====================================================
+//
+// Late after 09:30 AM
+//
+// =====================================================
+
+
+function isLateCheckIn(
+    checkIn,
+    attendanceDate
+){
+
+    if(!checkIn){
+
+        return false;
+
+    }
+
+
+    const checkInDate =
+        new Date(checkIn);
+
+
+    if(
+        isNaN(
+            checkInDate.getTime()
+        )
+    ){
+
+        return false;
+
+    }
+
+
+    const officeStart =
+        parseDate(
+            attendanceDate
+        );
+
+
+    if(!officeStart){
+
+        return false;
+
+    }
+
+
+    officeStart.setHours(
+        9,
+        30,
+        0,
+        0
+    );
+
+
+    return (
+        checkInDate >
+        officeStart
+    );
+
+}
+
+
+// =====================================================
+// APPROVED LEAVE CHECK
+// =====================================================
+
+
+function isEmployeeOnLeave(
+    employeeId,
+    date,
+    leaves
+){
+
+    return leaves.some(
+        leave => {
+
+            if(
+                String(
+                    leave.employee_id
+                )
+                !==
+                String(
+                    employeeId
+                )
+            ){
+
+                return false;
+
+            }
+
+
+            const from =
+                normalizeDate(
+                    leave.from_date
+                );
+
+
+            const to =
+                normalizeDate(
+                    leave.to_date
+                );
+
+
+            if(
+                !from ||
+                !to
+            ){
+
+                return false;
+
+            }
+
+
+            return (
+                date >= from &&
+                date <= to
+            );
+
+        }
+    );
+
+}
 
 
 // =====================================================
@@ -82,192 +451,320 @@ function getWorkingDays(from,to,holidays){
 
 async function generateReport(){
 
+    try{
 
+        const fromDate =
+            document.getElementById(
+                "reportFromDate"
+            )?.value;
 
-let fromDate =
-document.getElementById(
-"reportFromDate"
-).value;
 
+        const toDate =
+            document.getElementById(
+                "reportToDate"
+            )?.value;
 
 
-let toDate =
-document.getElementById(
-"reportToDate"
-).value;
+        const department =
+            document.getElementById(
+                "reportDepartment"
+            )?.value || "";
 
 
+        const employeeId =
+            document.getElementById(
+                "reportEmployee"
+            )?.value || "";
 
-if(!fromDate || !toDate){
 
+        // =================================================
+        // VALIDATE DATE
+        // =================================================
 
-alert(
-"Please select date range"
-);
 
+        if(
+            !fromDate ||
+            !toDate
+        ){
 
-return;
+            alert(
+                "Please select From Date and To Date."
+            );
 
+            return;
 
-}
+        }
 
 
+        if(
+            parseDate(fromDate) >
+            parseDate(toDate)
+        ){
 
+            alert(
+                "From Date cannot be greater than To Date."
+            );
 
+            return;
 
-// =============================
-// HOLIDAYS
-// =============================
+        }
 
 
-const {
+        // =================================================
+        // HOLIDAYS
+        // =================================================
 
-data:holidays
 
-}=await supabaseClient
+        const {
+            data: holidays,
+            error: holidayError
+        } = await supabaseClient
 
+            .from("holidays")
 
-.from("holidays")
+            .select("holiday_date");
 
-.select(
-"holiday_date"
-);
 
+        if(holidayError){
 
+            console.error(
+                "Holiday loading error:",
+                holidayError
+            );
 
-holidaysData =
-(holidays || [])
-.map(h=>h.holiday_date);
+            holidaysData = [];
 
+        }
+        else{
 
+            holidaysData =
+                (holidays || [])
+                .map(
+                    holiday =>
+                        normalizeDate(
+                            holiday.holiday_date
+                        )
+                )
+                .filter(Boolean);
 
+        }
 
 
-// =============================
-// WORKING DAYS
-// =============================
+        // =================================================
+        // WORKING DAYS
+        // =================================================
 
 
-let workingDays =
-getWorkingDays(
-fromDate,
-toDate,
-holidaysData
-);
+        const workingDays =
+            getWorkingDays(
+                fromDate,
+                toDate,
+                holidaysData
+            );
 
 
+        console.log(
+            "Working Days:",
+            workingDays.length
+        );
 
-console.log(
-"Working Days",
-workingDays
-);
 
+        console.log(
+            "Working Dates:",
+            workingDays
+        );
 
 
+        // =================================================
+        // EMPLOYEES
+        // =================================================
 
 
+        const {
+            data: employees,
+            error: employeeError
+        } = await supabaseClient
 
-// =============================
-// EMPLOYEES
-// =============================
+            .from("profiles")
 
+            .select(`
+                id,
+                full_name,
+                department,
+                role
+            `)
 
-const {
+            .eq(
+                "role",
+                "employee"
+            );
 
-data:employees
 
-}=await supabaseClient
+        if(employeeError){
 
+            console.error(
+                "Employee loading error:",
+                employeeError
+            );
 
-.from("profiles")
+            alert(
+                "Unable to load employees."
+            );
 
-.select(`
-id,
-full_name,
-department,
-role
-`)
+            return;
 
+        }
 
-.eq(
-"role",
-"employee"
-);
 
+        // =================================================
+        // ATTENDANCE
+        // =================================================
 
 
+        const {
+            data: attendance,
+            error: attendanceError
+        } = await supabaseClient
 
+            .from("attendance")
 
-// =============================
-// ATTENDANCE
-// =============================
+            .select("*")
 
+            .gte(
+                "attendance_date",
+                fromDate
+            )
 
-const {
+            .lte(
+                "attendance_date",
+                toDate
+            );
 
-data:attendance
 
-}=await supabaseClient
+        if(attendanceError){
 
+            console.error(
+                "Attendance loading error:",
+                attendanceError
+            );
 
-.from("attendance")
+            alert(
+                "Unable to load attendance data."
+            );
 
+            return;
 
-.select("*")
+        }
 
 
-.gte(
-"attendance_date",
-fromDate
-)
+        // =================================================
+        // APPROVED LEAVES
+        // =================================================
 
 
-.lte(
-"attendance_date",
-toDate
-);
+        const {
+            data: leaves,
+            error: leaveError
+        } = await supabaseClient
 
+            .from("leave_requests")
 
+            .select("*")
 
+            .eq(
+                "status",
+                "Approved"
+            );
 
 
+        if(leaveError){
 
+            console.error(
+                "Leave loading error:",
+                leaveError
+            );
 
-// =============================
-// LEAVES
-// =============================
+            alert(
+                "Unable to load approved leave data."
+            );
 
+            return;
 
-const {
+        }
 
-data:leaves
 
-}=await supabaseClient
+        // =================================================
+        // FILTER EMPLOYEES
+        // =================================================
 
 
-.from("leave_requests")
+        let filteredEmployees =
+            employees || [];
 
 
-.select("*")
+        // Department Filter
 
+        if(department){
 
-.eq(
-"status",
-"Approved"
-);
+            filteredEmployees =
+                filteredEmployees.filter(
+                    employee =>
+                        String(
+                            employee.department || ""
+                        )
+                        ===
+                        String(
+                            department
+                        )
+                );
 
+        }
 
 
+        // Employee Filter
 
+        if(employeeId){
 
-buildEmployeeReport(
-employees || [],
-attendance || [],
-leaves || [],
-workingDays
-);
+            filteredEmployees =
+                filteredEmployees.filter(
+                    employee =>
+                        String(
+                            employee.id
+                        )
+                        ===
+                        String(
+                            employeeId
+                        )
+                );
 
+        }
 
+
+        // =================================================
+        // BUILD REPORT
+        // =================================================
+
+
+        buildEmployeeReport(
+            filteredEmployees,
+            attendance || [],
+            leaves || [],
+            workingDays
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Report generation error:",
+            error
+        );
+
+        alert(
+            "Something went wrong while generating the report."
+        );
+
+    }
 
 }
 
@@ -278,492 +775,594 @@ workingDays
 
 
 function buildEmployeeReport(
-employees,
-attendance,
-leaves,
-workingDays
+    employees,
+    attendance,
+    leaves,
+    workingDays
 ){
 
+    reportData = [];
 
 
-reportData=[];
+    employees.forEach(
+        employee => {
 
 
+            let present = 0;
 
-employees.forEach(emp=>{
+            let halfDay = 0;
 
+            let absent = 0;
 
+            let leave = 0;
 
-let present=0;
-
-let late=0;
-
-let absent=0;
-
-let leave=0;
+            let late = 0;
 
 
-
-let totalWorkingDays =
-workingDays.length;
-
-
+            // =================================================
+            // DATE BY DATE
+            // =================================================
 
 
-
-workingDays.forEach(date=>{
-
-
-
-// =========================
-// ATTENDANCE FIND
-// =========================
+            workingDays.forEach(
+                date => {
 
 
-let att =
-attendance.find(a=>
-
-String(a.employee_id)
-===
-String(emp.id)
-
-&&
-
-a.attendance_date===date
-
-);
+                    // -----------------------------------------
+                    // APPROVED LEAVE
+                    // -----------------------------------------
 
 
+                    const onLeave =
+                        isEmployeeOnLeave(
+                            employee.id,
+                            date,
+                            leaves
+                        );
 
 
-// =========================
-// LEAVE CHECK
-// =========================
+                    if(onLeave){
+
+                        leave++;
+
+                        return;
+
+                    }
 
 
-let isLeave =
-leaves.some(l=>
-
-String(l.employee_id)
-===
-String(emp.id)
-
-&&
-
-date >= l.from_date
-
-&&
-
-date <= l.to_date
-
-);
+                    // -----------------------------------------
+                    // FIND ATTENDANCE
+                    // -----------------------------------------
 
 
+                    const att =
+                        attendance.find(
+                            record =>
+
+                                String(
+                                    record.employee_id
+                                )
+                                ===
+                                String(
+                                    employee.id
+                                )
+
+                                &&
+
+                                normalizeDate(
+                                    record.attendance_date
+                                )
+                                ===
+                                date
+                        );
 
 
-
-// =========================
-// STATUS CALCULATION
-// =========================
-
-
-
-if(isLeave){
+                    // -----------------------------------------
+                    // NO ATTENDANCE
+                    //
+                    // No check-in / no attendance:
+                    // Absent
+                    // -----------------------------------------
 
 
-leave++;
+                    if(!att){
+
+                        absent++;
+
+                        return;
+
+                    }
 
 
-return;
+                    // -----------------------------------------
+                    // STATUS
+                    // -----------------------------------------
 
+
+                    const status =
+                        getAttendanceStatus(
+                            att
+                        );
+
+
+                    // -----------------------------------------
+                    // PRESENT
+                    // -----------------------------------------
+
+
+                    if(
+                        status === "Present"
+                    ){
+
+                        present++;
+
+                    }
+
+
+                    // -----------------------------------------
+                    // HALF DAY
+                    // -----------------------------------------
+
+
+                    else if(
+                        status === "Half Day"
+                    ){
+
+                        halfDay++;
+
+                    }
+
+
+                    // -----------------------------------------
+                    // ABSENT
+                    // -----------------------------------------
+
+
+                    else{
+
+                        absent++;
+
+                    }
+
+
+                    // -----------------------------------------
+                    // LATE
+                    // -----------------------------------------
+
+
+                    if(
+                        isLateCheckIn(
+                            att.check_in,
+                            date
+                        )
+                    ){
+
+                        late++;
+
+                    }
+
+                }
+            );
+
+
+            // =================================================
+            // PAYROLL
+            // =================================================
+            //
+            // Base = 30
+            //
+            // Present       = 0
+            // Half Day      = 0.5
+            // Absent        = 1
+            // Approved Leave= 1
+            // Holiday       = 0
+            // Sunday        = 0
+            //
+            // =================================================
+
+
+            const monthlyBase =
+                30;
+
+
+            const halfDayDeduction =
+                halfDay * 0.5;
+
+
+            const absentDeduction =
+                absent;
+
+
+            const leaveDeduction =
+                leave;
+
+
+            const totalDeduction =
+                halfDayDeduction +
+                absentDeduction +
+                leaveDeduction;
+
+
+            let payroll =
+                monthlyBase -
+                totalDeduction;
+
+
+            // Never below zero
+
+            if(payroll < 0){
+
+                payroll = 0;
+
+            }
+
+
+            payroll =
+                Number(
+                    payroll.toFixed(2)
+                );
+
+
+            // =================================================
+            // PUSH REPORT DATA
+            // =================================================
+
+
+            reportData.push({
+
+                employee:
+                    employee,
+
+                workingDays:
+                    workingDays.length,
+
+                present:
+                    present,
+
+                halfDay:
+                    halfDay,
+
+                absent:
+                    absent,
+
+                leave:
+                    leave,
+
+                late:
+                    late,
+
+                payroll:
+                    payroll
+
+            });
+
+        }
+    );
+
+
+    console.log(
+        "FINAL REPORT:",
+        reportData
+    );
+
+
+    calculateSummary(
+        reportData
+    );
+
+
+    renderReport(
+        reportData
+    );
 
 }
-
-
-
-
-
-if(!att){
-
-
-absent++;
-
-
-return;
-
-
-}
-
-
-
-
-
-let checkIn =
-new Date(
-att.check_in
-);
-
-
-
-
-let officeTime =
-new Date(date);
-
-
-
-officeTime.setHours(
-10,
-15,
-0
-);
-
-
-
-
-
-if(checkIn > officeTime){
-
-
-late++;
-
-present++;
-
-
-}
-
-else{
-
-
-present++;
-
-
-}
-
-
-
-});
-
-
-
-
-
-
-
-let percentage=0;
-
-
-
-if(totalWorkingDays>0){
-
-
-percentage =
-Math.round(
-(present / totalWorkingDays)
-*
-100
-);
-
-
-}
-
-
-
-
-
-
-
-reportData.push({
-
-
-employee:emp,
-
-
-totalDays:totalWorkingDays,
-
-
-present:present,
-
-
-late:late,
-
-
-absent:absent,
-
-
-leave:leave,
-
-
-percentage:percentage
-
-
-
-});
-
-
-
-});
-
-
-
-
-console.log(
-"FINAL REPORT",
-reportData
-);
-
-
-
-
-calculateSummary(
-reportData
-);
-
-
-
-renderReport(
-reportData
-);
-
-
-
-}
-
-
-
 
 
 // =====================================================
-// SUMMARY CARDS
+// SUMMARY
 // =====================================================
 
 
 function calculateSummary(data){
 
+    const totalEmployees =
+        document.getElementById(
+            "totalEmployees"
+        );
 
 
-// Reports me total employees
-// duplicate nahi hoga
+    if(totalEmployees){
+
+        totalEmployees.innerText =
+            data.length;
+
+    }
 
 
-document.getElementById(
-"totalEmployees"
-).innerText =
-data.length;
+    let present = 0;
+
+    let halfDay = 0;
+
+    let absent = 0;
+
+    let leave = 0;
+
+    let late = 0;
 
 
+    data.forEach(
+        item => {
 
-// Ye dashboard ke liye nahi
-// isliye total count nahi
+            present +=
+                item.present;
 
+            halfDay +=
+                item.halfDay;
 
-let totalPresent=0;
+            absent +=
+                item.absent;
 
-let totalAbsent=0;
+            leave +=
+                item.leave;
 
-let totalLate=0;
+            late +=
+                item.late;
 
-let totalLeave=0;
-
-
-
-data.forEach(item=>{
-
-
-totalPresent += item.present;
-
-
-totalAbsent += item.absent;
+        }
+    );
 
 
-totalLate += item.late;
+    const presentCount =
+        document.getElementById(
+            "presentCount"
+        );
 
 
-totalLeave += item.leave;
+    if(presentCount){
+
+        presentCount.innerText =
+            present;
+
+    }
 
 
-});
+    const halfDayCount =
+        document.getElementById(
+            "halfDayCount"
+        );
 
 
+    if(halfDayCount){
+
+        halfDayCount.innerText =
+            halfDay;
+
+    }
 
 
-document.getElementById(
-"presentCount"
-).innerText =
-totalPresent;
+    const absentCount =
+        document.getElementById(
+            "absentCount"
+        );
 
 
+    if(absentCount){
 
-document.getElementById(
-"absentCount"
-).innerText =
-totalAbsent;
+        absentCount.innerText =
+            absent;
 
-
-
-document.getElementById(
-"lateCount"
-).innerText =
-totalLate;
+    }
 
 
+    const leaveCount =
+        document.getElementById(
+            "leaveCount"
+        );
 
-document.getElementById(
-"leaveCount"
-).innerText =
-totalLeave;
+
+    if(leaveCount){
+
+        leaveCount.innerText =
+            leave;
+
+    }
 
 
+    const lateCount =
+        document.getElementById(
+            "lateCount"
+        );
+
+
+    if(lateCount){
+
+        lateCount.innerText =
+            late;
+
+    }
 
 }
 
 
-
-
-
-
-
 // =====================================================
-// TABLE RENDER
+// RENDER REPORT TABLE
+// =====================================================
+//
+// Columns:
+//
+// Employee
+// Department
+// Working Days
+// Present
+// Half Day
+// Absent
+// On Leave
+// Late
+// Payroll Points
+//
+// NO:
+// Working Hours
+// Attendance %
+//
 // =====================================================
 
 
 function renderReport(data){
 
+    const table =
+        document.getElementById(
+            "reportTableBody"
+        );
 
 
-let table =
-document.getElementById(
-"reportTableBody"
-);
+    if(!table){
+
+        console.error(
+            "reportTableBody not found."
+        );
+
+        return;
+
+    }
 
 
+    if(!data.length){
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="9"
+                    style="text-align:center;"
+                >
+
+                    No Report Found
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
 
 
-if(!data.length){
+    let html = "";
 
 
-table.innerHTML=`
-
-<tr>
-
-<td colspan="8">
-
-No Report Found
-
-</td>
-
-</tr>
-
-`;
+    data.forEach(
+        item => {
 
 
-return;
+            html += `
 
+                <tr>
+
+                    <td>
+
+                        <strong>
+
+                            ${
+                                item.employee.full_name
+                            }
+
+                        </strong>
+
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            item.employee.department ||
+                            "-"
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            item.workingDays
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            item.present
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            item.halfDay
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            item.absent
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            item.leave
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            item.late
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        <strong>
+
+                            ${
+                                item.payroll
+                            }
+
+                        </strong>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+
+    table.innerHTML =
+        html;
 
 }
 
-
-
-
-
-
-let html="";
-
-
-
-
-data.forEach(item=>{
-
-
-
-html+=`
-
-<tr>
-
-
-<td>
-
-<strong>
-${item.employee.full_name}
-</strong>
-
-</td>
-
-
-
-<td>
-
-${item.employee.department || "-"}
-
-</td>
-
-
-
-<td>
-
-${item.present}
-
-</td>
-
-
-
-<td>
-
-${item.late}
-
-</td>
-
-
-
-<td>
-
-${item.leave}
-
-</td>
-
-
-
-<td>
-
-${item.absent}
-
-</td>
-
-
-
-<td>
-
-${item.totalDays}
-
-</td>
-
-
-
-<td>
-
-${item.percentage}%
-
-</td>
-
-
-
-</tr>
-
-`;
-
-
-
-});
-
-
-
-
-
-table.innerHTML=html;
-
-
-
-}
 
 // =====================================================
 // EXCEL EXPORT
@@ -772,114 +1371,75 @@ table.innerHTML=html;
 
 function exportExcel(){
 
+    if(!reportData.length){
+
+        alert(
+            "Generate report first."
+        );
+
+        return;
+
+    }
 
 
-if(!reportData.length){
+    const excelData =
+        reportData.map(
+            item => ({
+
+                Employee:
+                    item.employee.full_name,
+
+                Department:
+                    item.employee.department || "-",
+
+                Working_Days:
+                    item.workingDays,
+
+                Present:
+                    item.present,
+
+                Half_Day:
+                    item.halfDay,
+
+                Absent:
+                    item.absent,
+
+                Approved_Leave:
+                    item.leave,
+
+                Late:
+                    item.late,
+
+                Payroll_Points:
+                    item.payroll
+
+            })
+        );
 
 
-alert(
-"Generate report first"
-);
+    const sheet =
+        XLSX.utils.json_to_sheet(
+            excelData
+        );
 
 
-return;
+    const workbook =
+        XLSX.utils.book_new();
 
 
-}
+    XLSX.utils.book_append_sheet(
+        workbook,
+        sheet,
+        "Payroll Report"
+    );
 
 
-
-let excelData = [];
-
-
-
-reportData.forEach(item=>{
-
-
-excelData.push({
-
-Employee:
-item.employee.full_name,
-
-
-Department:
-item.employee.department || "-",
-
-
-Working_Days:
-item.totalDays,
-
-
-Present:
-item.present,
-
-
-Late:
-item.late,
-
-
-Leave:
-item.leave,
-
-
-Absent:
-item.absent,
-
-
-Attendance_Percentage:
-item.percentage+"%"
-
-
-
-});
-
-
-});
-
-
-
-
-
-let sheet =
-XLSX.utils.json_to_sheet(
-excelData
-);
-
-
-
-let workbook =
-XLSX.utils.book_new();
-
-
-
-XLSX.utils.book_append_sheet(
-
-workbook,
-
-sheet,
-
-"Attendance Report"
-
-);
-
-
-
-XLSX.writeFile(
-
-workbook,
-
-"Modern_Teams_Attendance_Report.xlsx"
-
-);
-
-
+    XLSX.writeFile(
+        workbook,
+        "Modern_Teams_Payroll_Report.xlsx"
+    );
 
 }
-
-
-
-
-
 
 
 // =====================================================
@@ -889,142 +1449,112 @@ workbook,
 
 function exportPDF(){
 
+    if(!reportData.length){
+
+        alert(
+            "Generate report first."
+        );
+
+        return;
+
+    }
 
 
-if(!reportData.length){
+    if(
+        !window.jspdf ||
+        !window.jspdf.jsPDF
+    ){
+
+        alert(
+            "PDF library is not loaded."
+        );
+
+        return;
+
+    }
 
 
-alert(
-"Generate report first"
-);
+    const {
+        jsPDF
+    } = window.jspdf;
 
 
-return;
+    const doc =
+        new jsPDF(
+            "landscape"
+        );
 
+
+    doc.text(
+        "Modern Teams HRMS Payroll Report",
+        14,
+        15
+    );
+
+
+    const rows =
+        reportData.map(
+            item => [
+
+                item.employee.full_name,
+
+                item.employee.department || "-",
+
+                item.workingDays,
+
+                item.present,
+
+                item.halfDay,
+
+                item.absent,
+
+                item.leave,
+
+                item.late,
+
+                item.payroll
+
+            ]
+        );
+
+
+    doc.autoTable({
+
+        startY: 25,
+
+        head: [[
+
+            "Employee",
+
+            "Department",
+
+            "Working Days",
+
+            "Present",
+
+            "Half Day",
+
+            "Absent",
+
+            "On Leave",
+
+            "Late",
+
+            "Payroll Points"
+
+        ]],
+
+        body:
+            rows
+
+    });
+
+
+    doc.save(
+        "Modern_Teams_Payroll_Report.pdf"
+    );
 
 }
-
-
-
-
-const {
-
-jsPDF
-
-}=window.jspdf;
-
-
-
-
-let doc =
-new jsPDF();
-
-
-
-
-
-doc.text(
-
-"Modern Teams HRMS Attendance Report",
-
-14,
-
-20
-
-);
-
-
-
-
-
-let rows =
-reportData.map(item=>[
-
-
-item.employee.full_name,
-
-
-item.employee.department || "-",
-
-
-item.present,
-
-
-item.late,
-
-
-item.leave,
-
-
-item.absent,
-
-
-item.percentage+"%"
-
-
-]);
-
-
-
-
-
-
-
-doc.autoTable({
-
-startY:30,
-
-
-head:[
-
-[
-
-"Employee",
-
-"Department",
-
-"Present",
-
-"Late",
-
-"Leave",
-
-"Absent",
-
-"Attendance %"
-
-
-]
-
-],
-
-
-
-body:rows
-
-
-
-});
-
-
-
-
-
-doc.save(
-
-"Modern_Teams_Report.pdf"
-
-);
-
-
-
-}
-
-
-
-
-
-
 
 
 // =====================================================
@@ -1034,17 +1564,20 @@ doc.save(
 
 function printReport(){
 
+    if(!reportData.length){
 
-window.print();
+        alert(
+            "Generate report first."
+        );
 
+        return;
+
+    }
+
+
+    window.print();
 
 }
-
-
-
-
-
-
 
 
 // =====================================================
@@ -1054,105 +1587,310 @@ window.print();
 
 function resetReport(){
 
+    const inputs =
+        document.querySelectorAll(
+            ".filter-card input"
+        );
 
 
-document
-.querySelectorAll(
-".filter-card input"
-)
-.forEach(input=>{
+    inputs.forEach(
+        input => {
 
-input.value="";
+            input.value = "";
 
-});
+        }
+    );
 
 
-
-document
-.querySelectorAll(
-".filter-card select"
-)
-.forEach(select=>{
-
-select.value="";
-
-});
+    const selects =
+        document.querySelectorAll(
+            ".filter-card select"
+        );
 
 
+    selects.forEach(
+        select => {
+
+            select.value = "";
+
+        }
+    );
 
 
-reportData=[];
+    reportData = [];
 
 
-
-document.getElementById(
-"reportTableBody"
-).innerHTML=`
-
-<tr>
-
-<td colspan="8">
-
-Generate report to view data
-
-</td>
-
-</tr>
-
-`;
+    const table =
+        document.getElementById(
+            "reportTableBody"
+        );
 
 
+    if(table){
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="9"
+                    style="text-align:center;"
+                >
+
+                    Generate report to view data
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    setDefaultDates();
 
 }
 
 
-
-
-
 // =====================================================
-// DEFAULT DATE
+// DEFAULT DATES
 // =====================================================
 
 
 function setDefaultDates(){
 
-
-let today =
-new Date();
-
+    const today =
+        new Date();
 
 
-let first =
-new Date(
-today.getFullYear(),
-today.getMonth(),
-1
-);
+    const firstDay =
+        new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            1
+        );
 
 
+    const fromInput =
+        document.getElementById(
+            "reportFromDate"
+        );
 
 
-document.getElementById(
-"reportFromDate"
-).value =
-formatDate(first);
+    const toInput =
+        document.getElementById(
+            "reportToDate"
+        );
 
 
+    if(fromInput){
+
+        fromInput.value =
+            formatDate(
+                firstDay
+            );
+
+    }
 
 
-document.getElementById(
-"reportToDate"
-).value =
-formatDate(today);
+    if(toInput){
 
+        toInput.value =
+            formatDate(
+                today
+            );
 
+    }
 
 }
 
 
+// =====================================================
+// LOAD REPORT FILTERS
+// =====================================================
 
 
+async function loadReportFilters(){
 
+    try{
+
+        const {
+            data: employees,
+            error
+        } = await supabaseClient
+
+            .from("profiles")
+
+            .select(`
+                id,
+                full_name,
+                department,
+                role
+            `)
+
+            .eq(
+                "role",
+                "employee"
+            )
+
+            .order(
+                "full_name",
+                {
+                    ascending: true
+                }
+            );
+
+
+        if(error){
+
+            console.error(
+                "Report filter loading error:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        const departmentSelect =
+            document.getElementById(
+                "reportDepartment"
+            );
+
+
+        const employeeSelect =
+            document.getElementById(
+                "reportEmployee"
+            );
+
+
+        // =================================================
+        // DEPARTMENT FILTER
+        // =================================================
+
+
+        if(departmentSelect){
+
+            const departments =
+                [
+                    ...new Set(
+                        (employees || [])
+                            .map(
+                                employee =>
+                                    employee.department
+                            )
+                            .filter(Boolean)
+                    )
+                ]
+                .sort();
+
+
+            departmentSelect.innerHTML = `
+
+                <option value="">
+                    All Departments
+                </option>
+
+            `;
+
+
+            departments.forEach(
+                department => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        department;
+
+
+                    option.textContent =
+                        department;
+
+
+                    departmentSelect.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+        }
+
+
+        // =================================================
+        // EMPLOYEE FILTER
+        // =================================================
+
+
+        if(employeeSelect){
+
+            employeeSelect.innerHTML = `
+
+                <option value="">
+                    All Employees
+                </option>
+
+            `;
+
+
+            (employees || [])
+                .forEach(
+                    employee => {
+
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+
+
+                        option.value =
+                            employee.id;
+
+
+                        option.textContent =
+                            employee.full_name;
+
+
+                        employeeSelect.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+        }
+
+    }
+    catch(error){
+
+        console.error(
+            "Filter loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// REPORT TYPE
+// =====================================================
+//
+// Current report engine is designed for the
+// final attendance/payroll summary.
+//
+// The existing Report Type dropdown can remain,
+// but all report types currently use the same
+// date-range summary.
+//
+// =====================================================
 
 
 // =====================================================
@@ -1161,110 +1899,83 @@ formatDate(today);
 
 
 document.addEventListener(
-
-"DOMContentLoaded",
-
-()=>{
+    "DOMContentLoaded",
+    async () => {
 
 
+        // Default date range
+
+        setDefaultDates();
 
 
+        // Load filters
 
-setDefaultDates();
-
-
-
+        await loadReportFilters();
 
 
+        // Generate
 
-document
-.getElementById(
-"generateReportBtn"
-)
-?.addEventListener(
+        document
+            .getElementById(
+                "generateReportBtn"
+            )
+            ?.addEventListener(
+                "click",
+                generateReport
+            );
 
-"click",
 
-generateReport
+        // Excel
 
+        document
+            .getElementById(
+                "exportExcelBtn"
+            )
+            ?.addEventListener(
+                "click",
+                exportExcel
+            );
+
+
+        // PDF
+
+        document
+            .getElementById(
+                "exportPdfBtn"
+            )
+            ?.addEventListener(
+                "click",
+                exportPDF
+            );
+
+
+        // Print
+
+        document
+            .getElementById(
+                "printReportBtn"
+            )
+            ?.addEventListener(
+                "click",
+                printReport
+            );
+
+
+        // Reset
+
+        document
+            .getElementById(
+                "resetReportBtn"
+            )
+            ?.addEventListener(
+                "click",
+                resetReport
+            );
+
+
+        // Auto generate
+
+        await generateReport();
+
+    }
 );
-
-
-
-
-
-document
-.getElementById(
-"exportExcelBtn"
-)
-?.addEventListener(
-
-"click",
-
-exportExcel
-
-);
-
-
-
-
-
-
-document
-.getElementById(
-"exportPdfBtn"
-)
-?.addEventListener(
-
-"click",
-
-exportPDF
-
-);
-
-
-
-
-
-
-document
-.getElementById(
-"printReportBtn"
-)
-?.addEventListener(
-
-"click",
-
-printReport
-
-);
-
-
-
-
-
-
-document
-.getElementById(
-"resetReportBtn"
-)
-?.addEventListener(
-
-"click",
-
-resetReport
-
-);
-
-
-
-
-
-
-// auto generate
-
-generateReport();
-
-
-
-});
