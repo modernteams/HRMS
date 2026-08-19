@@ -1639,7 +1639,397 @@ function renderAttendance(
 
 }
 
+// =====================================================
+// DAILY ATTENDANCE REPORT
+// =====================================================
 
+function getAttendanceReportData() {
+
+    const searchText =
+        (
+            document.getElementById(
+                "attendanceSearch"
+            )?.value || ""
+        )
+        .toLowerCase()
+        .trim();
+
+
+    const selectedDate =
+        getSelectedAttendanceDate();
+
+
+    const selectedDepartment =
+        document.getElementById(
+            "attendanceDepartment"
+        )?.value || "";
+
+
+    const selectedStatus =
+        document.getElementById(
+            "attendanceStatus"
+        )?.value || "";
+
+
+    // SAME DATA jo attendance table me use ho raha hai
+    let filtered =
+        buildDailyAttendance(
+            selectedDate
+        );
+
+
+    // SEARCH FILTER
+    if (searchText) {
+
+        filtered =
+            filtered.filter(att =>
+
+                (
+                    att.profiles?.full_name ||
+                    ""
+                )
+                .toLowerCase()
+                .includes(searchText)
+
+            );
+
+    }
+
+
+    // DEPARTMENT FILTER
+    if (selectedDepartment) {
+
+        filtered =
+            filtered.filter(att =>
+
+                att.profiles?.department ===
+                selectedDepartment
+
+            );
+
+    }
+
+
+    // STATUS FILTER
+    if (selectedStatus) {
+
+        filtered =
+            filtered.filter(att => {
+
+                let displayStatus =
+                    att.computedStatus;
+
+
+                if (
+                    displayStatus === "Present" &&
+                    att.isLate
+                ) {
+
+                    displayStatus = "Late";
+
+                }
+
+
+                return (
+                    displayStatus ===
+                    selectedStatus
+                );
+
+            });
+
+    }
+
+
+    return filtered;
+}
+
+
+
+// =====================================================
+// EXCEL DOWNLOAD
+// =====================================================
+
+function downloadAttendanceExcel() {
+
+    const data =
+        getAttendanceReportData();
+
+
+    if (!data.length) {
+
+        alert(
+            "Selected date/filter ke liye koi attendance record nahi mila."
+        );
+
+        return;
+    }
+
+
+    if (typeof XLSX === "undefined") {
+
+        alert(
+            "Excel library load nahi hui. Page reload karein."
+        );
+
+        return;
+    }
+
+
+    const selectedDate =
+        getSelectedAttendanceDate();
+
+
+    const reportData = [
+
+        [
+            "NAME",
+            "Department",
+            "Check-in",
+            "Check-out",
+            "Working Hours"
+        ]
+
+    ];
+
+
+    data.forEach(att => {
+
+        reportData.push([
+
+            att.profiles?.full_name ||
+            "Unknown",
+
+            att.profiles?.department ||
+            "-",
+
+            formatTime(
+                att.check_in
+            ),
+
+            formatTime(
+                att.check_out
+            ),
+
+            calculateLiveWorkingHours(
+                att
+            )
+
+        ]);
+
+    });
+
+
+    const worksheet =
+        XLSX.utils.aoa_to_sheet(
+            reportData
+        );
+
+
+    worksheet["!cols"] = [
+
+        { wch: 28 },
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 18 }
+
+    ];
+
+
+    const workbook =
+        XLSX.utils.book_new();
+
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Attendance"
+    );
+
+
+    XLSX.writeFile(
+        workbook,
+        `Attendance_Report_${selectedDate}.xlsx`
+    );
+
+}
+
+
+
+// =====================================================
+// PDF DOWNLOAD
+// =====================================================
+
+function downloadAttendancePDF() {
+
+    const data =
+        getAttendanceReportData();
+
+
+    if (!data.length) {
+
+        alert(
+            "Selected date/filter ke liye koi attendance record nahi mila."
+        );
+
+        return;
+    }
+
+
+    if (
+        !window.jspdf ||
+        !window.jspdf.jsPDF
+    ) {
+
+        alert(
+            "PDF library load nahi hui. Page reload karein."
+        );
+
+        return;
+    }
+
+
+    const {
+        jsPDF
+    } = window.jspdf;
+
+
+    const selectedDate =
+        getSelectedAttendanceDate();
+
+
+    const doc =
+        new jsPDF(
+            "landscape"
+        );
+
+
+    doc.setFontSize(16);
+
+    doc.text(
+        "Daily Attendance Report",
+        14,
+        15
+    );
+
+
+    doc.setFontSize(10);
+
+    doc.text(
+        `Date: ${selectedDate}`,
+        14,
+        22
+    );
+
+
+    const rows =
+        data.map(att => [
+
+            att.profiles?.full_name ||
+            "Unknown",
+
+            att.profiles?.department ||
+            "-",
+
+            formatTime(
+                att.check_in
+            ),
+
+            formatTime(
+                att.check_out
+            ),
+
+            calculateLiveWorkingHours(
+                att
+            )
+
+        ]);
+
+
+    doc.autoTable({
+
+        startY: 28,
+
+        head: [[
+            "NAME",
+            "Department",
+            "Check-in",
+            "Check-out",
+            "Working Hours"
+        ]],
+
+        body: rows,
+
+        theme: "grid",
+
+        styles: {
+            fontSize: 9,
+            cellPadding: 4
+        },
+
+        headStyles: {
+            fillColor: [
+                17,
+                17,
+                17
+            ],
+
+            textColor: [
+                255,
+                255,
+                255
+            ]
+        }
+
+    });
+
+
+    doc.save(
+        `Attendance_Report_${selectedDate}.pdf`
+    );
+
+}
+
+
+
+// =====================================================
+// REPORT BUTTON EVENTS
+// =====================================================
+
+function setupAttendanceReportButtons() {
+
+    const excelButton =
+        document.getElementById(
+            "downloadAttendanceExcelBtn"
+        );
+
+
+    const pdfButton =
+        document.getElementById(
+            "downloadAttendancePdfBtn"
+        );
+
+
+    if (excelButton) {
+
+        excelButton.addEventListener(
+            "click",
+            downloadAttendanceExcel
+        );
+
+    }
+
+
+    if (pdfButton) {
+
+        pdfButton.addEventListener(
+            "click",
+            downloadAttendancePDF
+        );
+
+    }
+
+}
 // =====================================================
 // AUTO REFRESH
 // =====================================================
@@ -1673,7 +2063,11 @@ function startAttendanceAutoRefresh() {
 document.addEventListener(
     "DOMContentLoaded",
     () => {
+        // ---------------------------------------------
+        // REPORT BUTTONS
+        // ---------------------------------------------
 
+        setupAttendanceReportButtons();
         // ---------------------------------------------
         // DEFAULT DATE
         // ---------------------------------------------
