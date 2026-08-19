@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/base.css">
@@ -86,23 +89,43 @@
                         <div>
                             <label for="attendanceStatus">Status</label>
                             <select id="attendanceStatus" class="form-control">
-    <option value="">All Status</option>
-    <option value="Present">Present</option>
-    <option value="Half Day">Half Day</option>
-    <option value="Absent">Absent</option>
-    <option value="Late">Late</option>
-    <option value="On Leave">On Leave</option>
-    <option value="Holiday">Holiday</option>
-    <option value="Week Off">Week Off</option>
-</select>
+                                <option value="">All Status</option>
+                                <option value="Present">Present</option>
+                                <option value="Half Day">Half Day</option>
+                                <option value="Absent">Absent</option>
+                                <option value="Late">Late</option>
+                                <option value="On Leave">On Leave</option>
+                                <option value="Holiday">Holiday</option>
+                                <option value="Week Off">Week Off</option>
+                            </select>
                         </div>
 
                     </div>
 
-                    <div class="filter-actions" style="margin-top: 15px; display: flex; gap: 10px;">
-                        <button id="attendanceSearchBtn" class="btn btn-primary">Search</button>
-                        <button id="resetAttendanceBtn" class="btn btn-secondary">Reset</button>
+                    <!-- FILTER BUTTONS -->
+                    <div class="filter-actions"
+                        style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+
+                        <button id="attendanceSearchBtn" class="btn btn-primary">
+                            Search
+                        </button>
+
+                        <button id="resetAttendanceBtn" class="btn btn-secondary">
+                            Reset
+                        </button>
+
+                        <!-- NEW: EXCEL DOWNLOAD -->
+                        <button id="downloadAttendanceExcelBtn" class="btn btn-primary">
+                            📥 Download Excel
+                        </button>
+
+                        <!-- NEW: PDF DOWNLOAD -->
+                        <button id="downloadAttendancePdfBtn" class="btn btn-primary">
+                            📄 Download PDF
+                        </button>
+
                     </div>
+
                 </div>
 
                 <!-- ATTENDANCE TABLE -->
@@ -112,24 +135,28 @@
                     <div class="table-responsive">
                         <table>
                             <thead>
-    <tr>
-       <th>Employee</th>
-<th>Date</th>
-<th>Check In</th>
-<th>Check Out</th>
-<th>Working Hours</th>
-<th>Break Time</th>
-<th>Activity</th>
-<th>Status</th>
-<th>Payroll Points</th>
-<th>Action</th>
-    </tr>
-</thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Date</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Working Hours</th>
+                                    <th>Break Time</th>
+                                    <th>Activity</th>
+                                    <th>Status</th>
+                                    <th>Payroll Points</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
                             <tbody id="attendanceTableBody">
                                 <tr>
-                                    <td colspan="10" style="text-align: center;">Loading attendance data...</td>
+                                    <td colspan="10" style="text-align: center;">
+                                        Loading attendance data...
+                                    </td>
                                 </tr>
                             </tbody>
+
                         </table>
                     </div>
                 </div>
@@ -140,7 +167,20 @@
     </div>
 
     <!-- SCRIPTS -->
+
+    <!-- SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- EXCEL DOWNLOAD LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- PDF DOWNLOAD LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+    <!-- PDF TABLE LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- EXISTING PROJECT SCRIPTS -->
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/admin-attendance.js"></script>
